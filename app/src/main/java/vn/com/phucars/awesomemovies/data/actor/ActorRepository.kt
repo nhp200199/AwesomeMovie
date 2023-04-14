@@ -1,5 +1,8 @@
 package vn.com.phucars.awesomemovies.data.actor
 
+import vn.com.phucars.awesomemovies.data.ResultData
+
+
 interface ActorRepository {
-    fun getActorById(id: String)
+    suspend fun getActorById(id: String): ResultData<ActorData>
 }

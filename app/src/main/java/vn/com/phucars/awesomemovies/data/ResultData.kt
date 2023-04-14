@@ -1,9 +1,9 @@
-package com.example.baseproject.data
+package vn.com.phucars.awesomemovies.data
 
-sealed class ResultDomain<out R> {
+sealed class ResultData<out R> {
 
-    data class Success<out T>(val data: T) : ResultDomain<T>()
-    data class Error(val exception: Exception) : ResultDomain<Nothing>()
+    data class Success<out T>(val data: T) : ResultData<T>()
+    data class Error(val exception: Exception) : ResultData<Nothing>()
 
     override fun toString(): String {
         return when (this) {
