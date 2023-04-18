@@ -1,9 +1,7 @@
 package vn.com.phucars.awesomemovies.data.title
 
-import com.nhaarman.mockitokotlin2.doReturn
 import io.mockk.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.mockito.Mockito.*
 import org.hamcrest.MatcherAssert.*
@@ -16,21 +14,21 @@ import org.mockito.junit.MockitoJUnitRunner
 
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
-import org.mockito.ArgumentCaptor
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class TitleRepositoryImplTest {
     lateinit var SUT: TitleRepositoryImpl
-    lateinit var titleDataSource: TitleDataSource
+    lateinit var titleRemoteDataSource: TitleRemoteDataSource
 
     @Before
     fun setup() {
-        titleDataSource = mockk<TitleDataSource>()
-        SUT = TitleRepositoryImpl(titleDataSource)
+        titleRemoteDataSource = mockk<TitleRemoteDataSource>()
+        SUT = TitleRepositoryImpl(titleRemoteDataSource)
 
     }
 
@@ -80,7 +78,7 @@ class TitleRepositoryImplTest {
         SUT.getTitlesByGenre(TitleDataTest.GENRE_DRAMA)
 
         coVerify(exactly = 1) {
-            titleDataSource.getTitlesByGenre(capture(slot))
+            titleRemoteDataSource.getTitlesByGenre(capture(slot))
         }
         assertThat(slot.captured, `is`(TitleDataTest.GENRE_DRAMA))
     }
@@ -93,7 +91,7 @@ class TitleRepositoryImplTest {
         SUT.getTitleById(TitleDataTest.TITLE_ID)
 
         coVerify(exactly = 1) {
-            titleDataSource.getTitleById(capture(slot))
+            titleRemoteDataSource.getTitleById(capture(slot))
         }
         assertThat(slot.captured, `is`(TitleDataTest.TITLE_ID))
     }
@@ -107,9 +105,31 @@ class TitleRepositoryImplTest {
         SUT.getTitleRating(TitleDataTest.TITLE_ID)
 
         coVerify(exactly = 1) {
-            titleDataSource.getTitleRating(capture(slot))
+            titleRemoteDataSource.getTitleRating(capture(slot))
         }
         assertThat(slot.captured, `is`(TitleDataTest.TITLE_ID))
+    }
+
+    @Test
+    fun getTitlesWithRatingByGenre_correctGenrePassed() = runTest {
+        val genreSlot = slot<String>()
+        successGetTitlesByGenre()
+        successGetTitleRating()
+
+        SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        coVerify { titleRemoteDataSource.getTitlesByGenre(capture(genreSlot)) }
+        assertThat(genreSlot.captured, `is`(TitleDataTest.GENRE_DRAMA))
+    }
+
+    @Test
+    fun getTitlesWithRatingByGenre_success_titlesWithRatingByGenreReturned() = runTest {
+        successGetTitlesByGenre()
+        successGetTitleRating()
+
+        val titles = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        assertThat(titles, `is`(instanceOf(ResultData.Success::class.java)))
     }
 
     //get titles by genre -> success -> store in database
@@ -126,28 +146,28 @@ class TitleRepositoryImplTest {
 
     //helper methods
     private suspend fun successGetTitleById() {
-        coEvery { titleDataSource.getTitleById(TitleDataTest.TITLE_ID) }
+        coEvery { titleRemoteDataSource.getTitleById(TitleDataTest.TITLE_ID) }
             .returns(ResultData.Success<BaseNetworkData<TitleData>>(
                 BaseNetworkData(TitleDataTest.TITLE_DATA)
             ))
     }
 
     private suspend fun successGetTitleRating() {
-        coEvery { titleDataSource.getTitleRating(TitleDataTest.TITLE_ID) }
+        coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_ID) }
             .returns(ResultData.Success<BaseNetworkData<TitleData.Rating>>(
                 BaseNetworkData(TitleDataTest.TITLE_RATING)
             ))
     }
 
     private suspend fun successGetTitlesByGenre() {
-        coEvery { titleDataSource.getTitlesByGenre(TitleDataTest.GENRE_DRAMA) }
+        coEvery { titleRemoteDataSource.getTitlesByGenre(TitleDataTest.GENRE_DRAMA) }
             .returns(ResultData.Success<BaseNetworkData<List<TitleData>>>(
                 BaseNetworkData(TitleDataTest.TITLE_LIST_DATA)
             ))
     }
 
     private suspend fun successGetGenres() {
-        coEvery { titleDataSource.getGenres() }
+        coEvery { titleRemoteDataSource.getGenres() }
             .returns(ResultData.Success(BaseNetworkData(TitleDataTest.GENRES_LIST)))
     }
 
