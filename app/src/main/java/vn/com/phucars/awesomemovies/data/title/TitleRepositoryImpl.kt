@@ -6,9 +6,10 @@ import vn.com.phucars.awesomemovies.data.ResultData
 class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSource) : TitleRepository {
     override suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
         val titlesByGenre = titleRemoteDataSource.getTitlesByGenre(genre)
-        if (titlesByGenre is ResultData.Success) {
-            return ResultData.Success(titlesByGenre.data.results)
-        } else throw Exception()
+        return when(titlesByGenre) {
+            is ResultData.Success -> ResultData.Success(titlesByGenre.data.results)
+            is ResultData.Error -> ResultData.Error(titlesByGenre.exception)
+        }
     }
 
     override suspend fun getTitleById(id: String): ResultData<TitleData> {
@@ -20,9 +21,10 @@ class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSour
 
     override suspend fun getTitleRating(titleId: String): ResultData<TitleData.Rating> {
         val titleRating = titleRemoteDataSource.getTitleRating(titleId)
-        if (titleRating is ResultData.Success) {
-            return ResultData.Success(titleRating.data.results)
-        } else throw Exception()
+        return when(titleRating) {
+            is ResultData.Success -> ResultData.Success(titleRating.data.results)
+            is ResultData.Error -> ResultData.Error(titleRating.exception)
+        }
     }
 
     override suspend fun getGenres(): ResultData<List<String?>> {
@@ -36,23 +38,27 @@ class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSour
 
     override suspend fun getTitlesWithRatingByGenre(genre: String): ResultData<List<TitleWithRatingData>> = withContext(Dispatchers.IO) {
         val titlesByGenre = getTitlesByGenre(genre)
-        if (titlesByGenre is ResultData.Success) {
-            val titleWithRatingDomain = titlesByGenre.data.map {
-                getRatingForTitleAsync(this, it)
-            }.awaitAll()
-            return@withContext ResultData.Success(titleWithRatingDomain)
-        } else throw Exception()
-    }
-
-    private fun getRatingForTitleAsync(coroutineScope: CoroutineScope, title: TitleData) =
-        coroutineScope.async {
-            val titleRating = getTitleRating(title.id) as ResultData.Success
-            return@async TitleWithRatingData(
-                title.id,
-                title.primaryImage,
-                title.titleText,
-                title.releaseDate,
-                titleRating.data
-            )
+        when(titlesByGenre) {
+            is ResultData.Success -> {
+                val titlesWithRatingData = titlesByGenre.data.map {
+                    async {
+                        var titleRating = getTitleRating(it.id)
+                        titleRating = when(titleRating) {
+                            is ResultData.Success -> ResultData.Success(titleRating.data)
+                            is ResultData.Error -> ResultData.Success(TitleData.Rating.DEFAULT_VALUE)
+                        }
+                        return@async TitleWithRatingData(
+                            it.id,
+                            it.primaryImage,
+                            it.titleText,
+                            it.releaseDate,
+                            titleRating.data
+                        )
+                    }
+                }.awaitAll()
+                return@withContext ResultData.Success(titlesWithRatingData)
+            }
+            is ResultData.Error -> return@withContext ResultData.Error(titlesByGenre.exception)
         }
+    }
 }

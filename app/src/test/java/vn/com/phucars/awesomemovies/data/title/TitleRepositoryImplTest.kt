@@ -132,6 +132,37 @@ class TitleRepositoryImplTest {
         assertThat(titles, `is`(instanceOf(ResultData.Success::class.java)))
     }
 
+    @Test
+    fun getGenre_generalError_generaErrorReturned() = runTest {
+        generalErrorGetGenre()
+
+        val data = SUT.getGenres()
+
+        assertThat(data, `is`(instanceOf(ResultData.Error::class.java)))
+    }
+
+    @Test
+    fun getTitlesWithRatingByGenre_generalErrorWhenGetTitles_generalErrorReturned() = runTest {
+        generalErrorGetTitlesByGenre()
+
+        val data = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        assertThat(data, `is`(instanceOf(ResultData.Error::class.java)))
+    }
+
+    @Test
+    fun getTitleWithRatingByGenre_generalErrorWhenGetRatingForATile_titlesWithRatingByGenreReturned_TitleWithErrorRatingHaveDefaultRatingValue() = runTest {
+        successGetTitlesByGenre()
+        generalErrorGetRatingForATitle()
+
+        val titlesWithRatingByGenre = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA) as ResultData.Success
+
+        assertThat(titlesWithRatingByGenre, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat(titlesWithRatingByGenre.data.size, `is`(TitleDataTest.TITLE_WITH_RATING_LIST_DATA.size))
+        val idx = titlesWithRatingByGenre.data.findLast { it.id == TitleDataTest.TITLE_ID }
+        assertThat(idx!!.rating, `is`(TitleData.Rating.DEFAULT_VALUE))
+    }
+
     //get titles by genre -> success -> store in database
 
     //get title's rating -> success -> store in database
@@ -145,6 +176,21 @@ class TitleRepositoryImplTest {
     //error cases
 
     //helper methods
+    private fun generalErrorGetRatingForATitle() {
+        coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_ID) }
+            .returns(ResultData.Error(Exception()))
+    }
+
+    private fun generalErrorGetTitlesByGenre() {
+        coEvery { titleRemoteDataSource.getTitlesByGenre(TitleDataTest.GENRE_DRAMA) }
+            .returns(ResultData.Error(Exception()))
+    }
+
+    private fun generalErrorGetGenre() {
+        coEvery { titleRemoteDataSource.getGenres() }
+            .returns(ResultData.Error(Exception()))
+    }
+
     private suspend fun successGetTitleById() {
         coEvery { titleRemoteDataSource.getTitleById(TitleDataTest.TITLE_ID) }
             .returns(ResultData.Success<BaseNetworkData<TitleData>>(

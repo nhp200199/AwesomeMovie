@@ -21,5 +21,9 @@ data class TitleData(
     data class Rating(
         val averageRating: Float,
         val numVotes: Int
-    )
+    ) {
+        companion object {
+            val DEFAULT_VALUE: Rating = Rating(0f, 0)
+        }
+    }
 }

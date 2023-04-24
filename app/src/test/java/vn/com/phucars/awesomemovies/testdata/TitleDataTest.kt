@@ -23,7 +23,7 @@ class TitleDataTest {
 
         val TITLE_LIST_DATA = listOf(
             TitleData(
-                "tt0001922",
+                TITLE_ID,
                 TitleData.PrimaryImage("https://m.media-amazon.com/images/M/MV5BMWY3YWY1OTktNjc3Ni00NThiLWI0ODYtOTNjM2E4YjQ2MmJkXkEyXkFqcGdeQXVyMjcyMzI2OTQ@._V1_.jpg"),
                 TitleData.TitleText("100 Years"),
                 TitleData.ReleaseDate(18, 11, 2115)
@@ -31,7 +31,7 @@ class TitleDataTest {
 
         val TITLE_WITH_RATING_LIST_DATA = listOf(
             TitleWithRatingData(
-                "tt0001922",
+                TITLE_ID,
                 TitleData.PrimaryImage("https://m.media-amazon.com/images/M/MV5BMWY3YWY1OTktNjc3Ni00NThiLWI0ODYtOTNjM2E4YjQ2MmJkXkEyXkFqcGdeQXVyMjcyMzI2OTQ@._V1_.jpg"),
                 TitleData.TitleText("100 Years"),
                 TitleData.ReleaseDate(18, 11, 2115),
