@@ -18,9 +18,8 @@ class TitleWithRatingViewModel(
     val titleWithRatingFlow = _titleWithRatingFlow
 
     fun initialize() {
+        _titleWithRatingFlow.value = ResultViewState.Loading
         viewModelScope.launch(dispatcherProvider.main()) {
-            _titleWithRatingFlow.value = ResultViewState.Loading
-
             val titlesWithRatingByGenre =
                 getTitlesWithRatingByGenre.getTitlesWithRatingByGenre("hello")
 

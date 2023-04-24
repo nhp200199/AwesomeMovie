@@ -4,6 +4,8 @@ import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.*
 import org.mockito.Mockito.*
 import org.hamcrest.MatcherAssert.*
@@ -15,6 +17,7 @@ import org.junit.Rule
 import org.junit.Test
 import vn.com.phucars.awesomemovies.StandardTestDispatcherProvider
 import vn.com.phucars.awesomemovies.CoroutineTestRule
+import vn.com.phucars.awesomemovies.TestUtils
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.GetTitlesWithRatingByGenre
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
@@ -39,13 +42,24 @@ class TitleWithRatingViewModelTest {
         success()
 
         SUT.initialize()
+        runCurrent()
 
-        SUT.titleWithRatingFlow.test() {
-            assertThat(awaitItem(), `is`(ResultViewState.Initial))
-            assertThat(awaitItem(), `is`(ResultViewState.Loading))
-            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Success::class.java)) )
-            cancelAndConsumeRemainingEvents()
-        }
+        assertThat(SUT.titleWithRatingFlow.value, `is`(instanceOf(ResultViewState.Success::class.java)) )
+    }
+
+    @Test
+    fun initialize_emitLoadingViewState() = runTest(Job()) {
+        coEvery { getTitlesWithRatingByGenre.getTitlesWithRatingByGenre(ofType(String::class)) }
+            .coAnswers {
+                //suspend the coroutine to test loading value
+                delay(1000L)
+                ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
+            }
+
+        SUT.initialize()
+        runCurrent()
+
+        assertThat(SUT.titleWithRatingFlow.value, `is`(ResultViewState.Loading))
     }
 
     @Test
@@ -53,12 +67,9 @@ class TitleWithRatingViewModelTest {
         failure()
 
         SUT.initialize()
+        runCurrent()
 
-        SUT.titleWithRatingFlow.test {
-            assertThat(awaitItem(), `is`(ResultViewState.Initial))
-            assertThat(awaitItem(), `is`(ResultViewState.Loading))
-            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Error::class.java)) )
-        }
+        assertThat(SUT.titleWithRatingFlow.value, `is`(instanceOf(ResultViewState.Error::class.java)))
     }
 
     private fun failure() {
