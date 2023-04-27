@@ -4,26 +4,50 @@ import kotlinx.coroutines.*
 import vn.com.phucars.awesomemovies.data.ResultData
 
 class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSource) : TitleRepository {
-    override suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
+    private suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
         val titlesByGenre = titleRemoteDataSource.getTitlesByGenre(genre)
         return when(titlesByGenre) {
-            is ResultData.Success -> ResultData.Success(titlesByGenre.data.results)
             is ResultData.Error -> ResultData.Error(titlesByGenre.exception)
+            is ResultData.Success -> ResultData.Success(titlesByGenre.data.results)
         }
     }
 
-    override suspend fun getTitleById(id: String): ResultData<TitleData> {
+    override suspend fun getTitleWithRatingById(id: String): ResultData<TitleWithRatingData> {
         val titleById = titleRemoteDataSource.getTitleById(id)
-        if (titleById is ResultData.Success) {
-            return ResultData.Success(titleById.data.results)
-        } else throw Exception()
+        when(titleById) {
+            is ResultData.Error -> return ResultData.Error(titleById.exception)
+            is ResultData.Success -> {
+                val titleRating = titleRemoteDataSource.getTitleRating(id)
+                when(titleRating) {
+                    is ResultData.Success -> {
+                        val titleWithRating = TitleWithRatingData(
+                            titleById.data.results.id,
+                            titleById.data.results.primaryImage,
+                            titleById.data.results.titleText,
+                            titleById.data.results.releaseDate,
+                            titleRating.data.results
+                        )
+                        return ResultData.Success(titleWithRating)
+                    }
+                    is ResultData.Error -> return ResultData.Success(
+                        TitleWithRatingData(
+                            titleById.data.results.id,
+                            titleById.data.results.primaryImage,
+                            titleById.data.results.titleText,
+                            titleById.data.results.releaseDate,
+                            TitleData.Rating.DEFAULT_VALUE
+                        )
+                    )
+                }
+            }
+        }
     }
 
-    override suspend fun getTitleRating(titleId: String): ResultData<TitleData.Rating> {
+    private suspend fun getTitleRating(titleId: String): ResultData<TitleData.Rating> {
         val titleRating = titleRemoteDataSource.getTitleRating(titleId)
         return when(titleRating) {
-            is ResultData.Success -> ResultData.Success(titleRating.data.results)
             is ResultData.Error -> ResultData.Error(titleRating.exception)
+            is ResultData.Success -> ResultData.Success(titleRating.data.results)
         }
     }
 
@@ -39,6 +63,7 @@ class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSour
     override suspend fun getTitlesWithRatingByGenre(genre: String): ResultData<List<TitleWithRatingData>> = withContext(Dispatchers.IO) {
         val titlesByGenre = getTitlesByGenre(genre)
         when(titlesByGenre) {
+            is ResultData.Error -> return@withContext ResultData.Error(titlesByGenre.exception)
             is ResultData.Success -> {
                 val titlesWithRatingData = titlesByGenre.data.map {
                     async {
@@ -58,7 +83,6 @@ class TitleRepositoryImpl(private val titleRemoteDataSource: TitleRemoteDataSour
                 }.awaitAll()
                 return@withContext ResultData.Success(titlesWithRatingData)
             }
-            is ResultData.Error -> return@withContext ResultData.Error(titlesByGenre.exception)
         }
     }
 }

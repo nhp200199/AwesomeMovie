@@ -16,7 +16,6 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Test
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.ResultData
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,33 +32,6 @@ class TitleRepositoryImplTest {
     }
 
     @Test
-    fun getTitlesByGenre_success_titleDataWithGivenGenreReturned() = runTest {
-        successGetTitlesByGenre()
-
-        val titlesByGenre = SUT.getTitlesByGenre(TitleDataTest.GENRE_DRAMA)
-
-        assertThat(titlesByGenre, `is`(instanceOf(ResultData.Success::class.java)))
-    }
-
-    @Test
-    fun getTitleById_success_titleDataWithGivenIdReturned() = runTest {
-        successGetTitleById()
-
-        val titleById = SUT.getTitleById(TitleDataTest.TITLE_ID)
-
-        assertThat(titleById, `is`(instanceOf(ResultData.Success::class.java)))
-    }
-
-    @Test
-    fun getTitleRating_success_titleRatingReturned() = runTest {
-        successGetTitleRating()
-
-        val titleRating = SUT.getTitleRating(TitleDataTest.TITLE_ID)
-
-        assertThat(titleRating, `is`(instanceOf(ResultData.Success::class.java)))
-    }
-
-    @Test
     fun getGenres_success_genresListWithoutNullValuesReturned() = runTest {
         successGetGenres()
 
@@ -71,24 +43,12 @@ class TitleRepositoryImplTest {
     }
 
     @Test
-    fun getTitlesByGenre_correctGenrePassed() = runTest {
-        val slot = slot<String>()
-        successGetTitlesByGenre()
-
-        SUT.getTitlesByGenre(TitleDataTest.GENRE_DRAMA)
-
-        coVerify(exactly = 1) {
-            titleRemoteDataSource.getTitlesByGenre(capture(slot))
-        }
-        assertThat(slot.captured, `is`(TitleDataTest.GENRE_DRAMA))
-    }
-
-    @Test
-    fun getTitleById_correctIdPassed() = runTest {
+    fun getTitleWithRatingById_correctTitleIdPassed() = runTest {
         val slot = slot<String>()
         successGetTitleById()
+        successGetTitleRating()
 
-        SUT.getTitleById(TitleDataTest.TITLE_ID)
+        SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
         coVerify(exactly = 1) {
             titleRemoteDataSource.getTitleById(capture(slot))
@@ -96,18 +56,36 @@ class TitleRepositoryImplTest {
         assertThat(slot.captured, `is`(TitleDataTest.TITLE_ID))
     }
 
-    //get title's rating -> check correct title's id passed to method
+    //get title with rating by id -> success -> data returned
     @Test
-    fun getTitleRating_correctTitleIdPassed() = runTest {
-        val slot = slot<String>()
+    fun getTitleWithRatingById_success_titleWithRatingReturned() = runTest {
+        successGetTitleById()
         successGetTitleRating()
 
-        SUT.getTitleRating(TitleDataTest.TITLE_ID)
+        val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
-        coVerify(exactly = 1) {
-            titleRemoteDataSource.getTitleRating(capture(slot))
-        }
-        assertThat(slot.captured, `is`(TitleDataTest.TITLE_ID))
+        assertThat(titleWithRatingById, `is`(instanceOf(ResultData.Success::class.java)))
+    }
+
+    @Test
+    fun getTitleWithRatingById_generalErrorWhenGetTitle_generalErrorReturned() = runTest {
+        generalErrorGettingTitleById()
+        successGetTitleRating()
+
+        val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
+
+        assertThat(titleWithRatingById, `is`(instanceOf(ResultData.Error::class.java)))
+    }
+
+    @Test
+    fun getTitleWithRatingById_generalErrorWhenGetTitleRating_titleWithRatingReturned_ratingDataHasDefaultValue() = runTest {
+        successGetTitleById()
+        generalErrorGetRatingForATitle()
+
+        val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID) as ResultData.Success
+
+        assertThat(titleWithRatingById, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat(titleWithRatingById.data.rating, `is`(TitleData.Rating.DEFAULT_VALUE))
     }
 
     @Test
@@ -176,6 +154,11 @@ class TitleRepositoryImplTest {
     //error cases
 
     //helper methods
+    private fun generalErrorGettingTitleById() {
+        coEvery { titleRemoteDataSource.getTitleById(TitleDataTest.TITLE_ID) }
+            .returns(ResultData.Error(Exception()))
+    }
+
     private fun generalErrorGetRatingForATitle() {
         coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_ID) }
             .returns(ResultData.Error(Exception()))
