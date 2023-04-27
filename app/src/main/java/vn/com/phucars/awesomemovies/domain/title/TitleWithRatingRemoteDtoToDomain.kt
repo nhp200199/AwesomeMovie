@@ -1,10 +1,10 @@
 package vn.com.phucars.awesomemovies.domain.title
 
 import vn.com.phucars.awesomemovies.mapper.Mapper
-import vn.com.phucars.awesomemovies.data.title.TitleWithRatingData
+import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
 
-class TitleWithRatingDtoToDomain: Mapper<TitleWithRatingData, TitleWithRatingDomain> {
-    override fun map(input: TitleWithRatingData): TitleWithRatingDomain {
+class TitleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain> {
+    override fun map(input: TitleWithRatingRemoteData): TitleWithRatingDomain {
         return TitleWithRatingDomain(
             input.id,
             input.primaryImage.url,

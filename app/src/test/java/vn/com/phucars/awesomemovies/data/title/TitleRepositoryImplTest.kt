@@ -16,19 +16,28 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Test
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
+import vn.com.phucars.awesomemovies.mapper.ListMapper
+import vn.com.phucars.awesomemovies.mapper.Mapper
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
+import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class TitleRepositoryImplTest {
     lateinit var SUT: TitleRepositoryImpl
     lateinit var titleRemoteDataSource: TitleRemoteDataSource
+    val titleLocalDataSourceTd = TitleLocalDataSourceTd()
+    lateinit var titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>
+    lateinit var titlesWithRatingDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
 
     @Before
     fun setup() {
         titleRemoteDataSource = mockk<TitleRemoteDataSource>()
-        SUT = TitleRepositoryImpl(titleRemoteDataSource)
+        titleWithRatingRemoteDtoToDomain = mockk<Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>>()
+        titlesWithRatingDomainToLocalDto = mockk<ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>>()
 
+        SUT = TitleRepositoryImpl(titleRemoteDataSource, titleLocalDataSourceTd,  titleWithRatingRemoteDtoToDomain, titlesWithRatingDomainToLocalDto)
     }
 
     @Test
@@ -47,6 +56,7 @@ class TitleRepositoryImplTest {
         val slot = slot<String>()
         successGetTitleById()
         successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
 
         SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
@@ -61,6 +71,7 @@ class TitleRepositoryImplTest {
     fun getTitleWithRatingById_success_titleWithRatingReturned() = runTest {
         successGetTitleById()
         successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
 
         val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
@@ -81,11 +92,13 @@ class TitleRepositoryImplTest {
     fun getTitleWithRatingById_generalErrorWhenGetTitleRating_titleWithRatingReturned_ratingDataHasDefaultValue() = runTest {
         successGetTitleById()
         generalErrorGetRatingForATitle()
+        mapTitleWithDefaultRatingRemoteDtoToDomain()
 
         val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID) as ResultData.Success
 
         assertThat(titleWithRatingById, `is`(instanceOf(ResultData.Success::class.java)))
-        assertThat(titleWithRatingById.data.rating, `is`(TitleData.Rating.DEFAULT_VALUE))
+        assertThat(titleWithRatingById.data.averageRating, `is`(TitleData.Rating.DEFAULT_VALUE.averageRating))
+        assertThat(titleWithRatingById.data.numVotes, `is`(TitleData.Rating.DEFAULT_VALUE.numVotes))
     }
 
     @Test
@@ -93,6 +106,7 @@ class TitleRepositoryImplTest {
         val genreSlot = slot<String>()
         successGetTitlesByGenre()
         successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
 
         SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
 
@@ -104,6 +118,7 @@ class TitleRepositoryImplTest {
     fun getTitlesWithRatingByGenre_success_titlesWithRatingByGenreReturned() = runTest {
         successGetTitlesByGenre()
         successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
 
         val titles = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
 
@@ -129,21 +144,58 @@ class TitleRepositoryImplTest {
     }
 
     @Test
-    fun getTitleWithRatingByGenre_generalErrorWhenGetRatingForATile_titlesWithRatingByGenreReturned_TitleWithErrorRatingHaveDefaultRatingValue() = runTest {
+    fun getTitlesWithRatingByGenre_generalErrorWhenGetRatingForATile_titlesWithRatingByGenreReturned_TitleWithErrorRatingHaveDefaultRatingValue() = runTest {
         successGetTitlesByGenre()
         generalErrorGetRatingForATitle()
+        mapTitleWithDefaultRatingRemoteDtoToDomain()
 
         val titlesWithRatingByGenre = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA) as ResultData.Success
 
         assertThat(titlesWithRatingByGenre, `is`(instanceOf(ResultData.Success::class.java)))
-        assertThat(titlesWithRatingByGenre.data.size, `is`(TitleDataTest.TITLE_WITH_RATING_LIST_DATA.size))
+        assertThat(titlesWithRatingByGenre.data.size, `is`(TitleDataTest.TITLE_WITH_RATING_REMOTE_LIST_DATA.size))
         val idx = titlesWithRatingByGenre.data.findLast { it.id == TitleDataTest.TITLE_ID }
-        assertThat(idx!!.rating, `is`(TitleData.Rating.DEFAULT_VALUE))
+        assertThat(idx!!.averageRating, `is`(TitleData.Rating.DEFAULT_VALUE.averageRating))
+        assertThat(idx!!.numVotes, `is`(TitleData.Rating.DEFAULT_VALUE.numVotes))
     }
 
-    //get titles by genre -> success -> store in database
 
-    //get title's rating -> success -> store in database
+
+    @Test
+    fun getTitlesWithRatingByGenre_success_dataCached() = runTest {
+        successGetTitlesByGenre()
+        successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
+        mapTitlesWithRatingDomainToLocalDto()
+
+        SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        assertThat(titleLocalDataSourceTd.cachedTitlesWithRating, `is`(TitleDataTest.TITLE_WITH_RATING_LOCAL_LIST_DATA))
+    }
+
+    @Test
+    fun getTitlesWithRatingByGenre_generalErrorGetTitles_noInteractionDataCached() = runTest {
+        generalErrorGetTitlesByGenre()
+
+        SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        assertThat(titleLocalDataSourceTd.cachedTitlesWithRating, `is`(nullValue()))
+    }
+
+    @Test
+    fun getTitlesWithRatingByGenre_generalErrorGetTitleRating_noInteractionDataCached() = runTest {
+        successGetTitlesByGenre()
+        generalErrorGetRatingForATitle()
+        mapTitleWithDefaultRatingRemoteDtoToDomain()
+        mapTitlesWithDefaultRatingDomainToLocalDto()
+
+        SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+
+        assertThat(titleLocalDataSourceTd.cachedTitlesWithRating, `is`(TitleDataTest.TITLE_WITH_DEFAULT_RATING_LOCAL_LIST_DATA))
+    }
+
+    //get title with rating by id -> success -> update the title in database
+    //get title with rating by id -> general title error -> not update in database
+    //get title with rating by id -> general rating error -> not update in database
 
     //offline cases
     //get titles with rating -> success -> titles with rating returned
@@ -151,9 +203,27 @@ class TitleRepositoryImplTest {
 
     //end offline cases
 
-    //error cases
-
     //helper methods
+    private fun mapTitlesWithDefaultRatingDomainToLocalDto() {
+        every { titlesWithRatingDomainToLocalDto.map(TitleDomainTest.TITLE_WITH_DEFAULT_RATING_LIST_DOMAIN) }
+            .returns(TitleDataTest.TITLE_WITH_DEFAULT_RATING_LOCAL_LIST_DATA)
+    }
+
+    private fun mapTitlesWithRatingDomainToLocalDto() {
+        every { titlesWithRatingDomainToLocalDto.map(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN) }
+            .returns(TitleDataTest.TITLE_WITH_RATING_LOCAL_LIST_DATA)
+    }
+
+    private fun mapTitleWithDefaultRatingRemoteDtoToDomain() {
+        every { titleWithRatingRemoteDtoToDomain.map(TitleDataTest.TITLE_WITH_DEFAULT_RATING_REMOTE_DATA) }
+            .returns(TitleDomainTest.TITLE_WITH_DEFAULT_RATING_DOMAIN)
+    }
+
+    private fun mapTitleWithRatingRemoteDtoToDomain() {
+        every { titleWithRatingRemoteDtoToDomain.map(TitleDataTest.TITLE_WITH_RATING_REMOTE_DATA) }
+            .returns(TitleDomainTest.TITLE_WITH_RATING_DOMAIN)
+    }
+
     private fun generalErrorGettingTitleById() {
         coEvery { titleRemoteDataSource.getTitleById(TitleDataTest.TITLE_ID) }
             .returns(ResultData.Error(Exception()))
