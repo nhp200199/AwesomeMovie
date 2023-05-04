@@ -10,12 +10,8 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
-import vn.com.phucars.awesomemovies.data.ResultData
-import vn.com.phucars.awesomemovies.data.title.TitleData
 import vn.com.phucars.awesomemovies.data.title.TitleRepository
-import vn.com.phucars.awesomemovies.data.title.TitleWithRatingData
 import vn.com.phucars.awesomemovies.domain.ResultDomain
-import vn.com.phucars.awesomemovies.mapper.ListMapper
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 
@@ -24,13 +20,11 @@ import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 class GetTitlesWithRatingByGenreTest {
     lateinit var SUT: GetTitlesWithRatingByGenre
     lateinit var repository: TitleRepository
-    lateinit var mapper: ListMapper<List<TitleWithRatingData>, List<TitleWithRatingDomain>>
 
     @Before
     fun setup() {
         repository = mockk<TitleRepository>()
-        mapper = mockk<ListMapper<List<TitleWithRatingData>, List<TitleWithRatingDomain>>>()
-        SUT = GetTitlesWithRatingByGenre(repository, mapper)
+        SUT = GetTitlesWithRatingByGenre(repository)
     }
 
     @Test
@@ -40,7 +34,7 @@ class GetTitlesWithRatingByGenreTest {
 
         SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
 
-        coVerify { repository.getTitlesWithRatingByGenre(capture(genreSlot)) }
+        coVerify { repository.getTitleWithRatingListByGenre(capture(genreSlot)) }
         assertThat(genreSlot.captured, `is`(TitleDataTest.GENRE_DRAMA))
     }
 
@@ -58,10 +52,10 @@ class GetTitlesWithRatingByGenreTest {
     // get rating failed - the title with that is will have default value of ---
 
     private fun success() {
-        coEvery { repository.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA) }
-            .returns(ResultData.Success<List<TitleWithRatingData>>(TitleDataTest.TITLE_WITH_RATING_LIST_DATA))
-        every {
-            mapper.map(TitleDataTest.TITLE_WITH_RATING_LIST_DATA)
-        }.returns(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
+        coEvery { repository.getTitleWithRatingListByGenre(TitleDataTest.GENRE_DRAMA) }
+            .returns(ResultDomain.Success<List<TitleWithRatingDomain>>(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
+//        every {
+//            mapper.map(TitleDataTest.TITLE_WITH_RATING_REMOTE_LIST_DATA)
+//        }.returns(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
     }
 }
