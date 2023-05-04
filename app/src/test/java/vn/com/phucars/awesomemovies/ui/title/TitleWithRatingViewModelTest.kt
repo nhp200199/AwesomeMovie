@@ -1,6 +1,5 @@
-package vn.com.phucars.awesomemovies.ui.titlesWithRating
+package vn.com.phucars.awesomemovies.ui.title
 
-import app.cash.turbine.test
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 import vn.com.phucars.awesomemovies.StandardTestDispatcherProvider
 import vn.com.phucars.awesomemovies.CoroutineTestRule
-import vn.com.phucars.awesomemovies.TestUtils
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.GetTitlesWithRatingByGenre
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest

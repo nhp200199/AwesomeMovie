@@ -23,6 +23,11 @@ class TitleDataTest {
             50
         )
 
+        val UPDATE_TITLE_RATING = TitleData.Rating(
+            4.9f,
+            52
+        )
+
         val TITLE_LIST_DATA = listOf(
             TITLE_DATA
         )
@@ -81,6 +86,23 @@ class TitleDataTest {
             "Animation",
             "Biography",
             "Comedy",
+        )
+
+        val TITLE_WITH_UPDATED_RATING_LOCAL_DATA: TitleWithRatingLocalData = TitleWithRatingLocalData(
+            TITLE_ID,
+            TITLE_DATA.primaryImage.url,
+            TITLE_DATA.titleText.text,
+            "${TITLE_DATA.releaseDate.day}-${TITLE_DATA.releaseDate.month}-${TITLE_DATA.releaseDate.year}",
+            UPDATE_TITLE_RATING.averageRating,
+            UPDATE_TITLE_RATING.numVotes
+        )
+
+        val TITLE_WITH_UPDATED_RATING_REMOTE_DATA = TitleWithRatingRemoteData(
+            TITLE_DATA.id,
+            TITLE_DATA.primaryImage,
+            TITLE_DATA.titleText,
+            TITLE_DATA.releaseDate,
+            UPDATE_TITLE_RATING
         )
     }
 }

@@ -34,6 +34,13 @@ class TitleDomainTest {
             TITLE_WITH_RATING_DOMAIN
         )
 
-
+        val TITLE_WITH_UPDATED_RATING_DOMAIN = TitleWithRatingDomain(
+            TitleDataTest.TITLE_ID,
+            TitleDataTest.TITLE_DATA.primaryImage.url,
+            TitleDataTest.TITLE_DATA.titleText.text,
+            "${TitleDataTest.TITLE_DATA.releaseDate.day}-${TitleDataTest.TITLE_DATA.releaseDate.month}-${TitleDataTest.TITLE_DATA.releaseDate.year}",
+            TitleDataTest.UPDATE_TITLE_RATING.averageRating,
+            TitleDataTest.UPDATE_TITLE_RATING.numVotes,
+        )
     }
 }

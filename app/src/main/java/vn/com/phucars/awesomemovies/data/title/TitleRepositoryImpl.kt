@@ -10,6 +10,7 @@ class TitleRepositoryImpl(
     private val titleRemoteDataSource: TitleRemoteDataSource,
     private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
+    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
     private val titlesWithRatingDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
 ) : TitleRepository {
     private suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
@@ -37,6 +38,7 @@ class TitleRepositoryImpl(
                                 titleRating.data.results
                             )
                         )
+                        titleLocalDataSource.cacheTitleWithRating(titleWithRatingDomainToLocalDto.map(titleWithRating))
                         return ResultData.Success(titleWithRating)
                     }
                     is ResultData.Error -> return ResultData.Success(

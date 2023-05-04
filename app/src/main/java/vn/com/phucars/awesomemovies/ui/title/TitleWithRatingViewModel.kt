@@ -1,4 +1,4 @@
-package vn.com.phucars.awesomemovies.ui.titlesWithRating
+package vn.com.phucars.awesomemovies.ui.title
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
