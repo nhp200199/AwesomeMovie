@@ -32,6 +32,7 @@ class TitleRepositoryImplTest {
     lateinit var titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>
     lateinit var titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>
     lateinit var titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
+    lateinit var titleWithRatingListLocalToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
 
     @Before
     fun setup() {
@@ -42,13 +43,15 @@ class TitleRepositoryImplTest {
             mockk<ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>>()
         titleWithRatingDomainToLocalDto =
             mockk<Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>>()
+        titleWithRatingListLocalToDomain = mockk<ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>>()
 
         SUT = TitleRepositoryImpl(
             titleRemoteDataSource,
             titleLocalDataSourceTd,
             titleWithRatingRemoteDtoToDomain,
             titleWithRatingDomainToLocalDto,
-            titleWithRatingListDomainToLocalDto
+            titleWithRatingListDomainToLocalDto,
+            titleWithRatingListLocalToDomain
         )
     }
 
@@ -70,6 +73,7 @@ class TitleRepositoryImplTest {
         successGetTitleRating()
         mapTitleWithRatingRemoteDtoToDomain()
         mapTitleWithRatingDomainToLocalDto()
+        populateLocalData()
 
         SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
@@ -86,6 +90,7 @@ class TitleRepositoryImplTest {
         successGetTitleRating()
         mapTitleWithRatingRemoteDtoToDomain()
         mapTitleWithRatingDomainToLocalDto()
+        populateLocalData()
 
         val titleWithRatingById = SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID)
 
@@ -215,7 +220,7 @@ class TitleRepositoryImplTest {
 
         SUT.getTitleWithRatingListByGenre(TitleDataTest.GENRE_DRAMA)
 
-        assertThat(titleLocalDataSourceTd.cachedTitlesWithRating, `is`(nullValue()))
+        assertThat(titleLocalDataSourceTd.cacheTitleCount, `is`(0))
     }
 
     @Test
@@ -239,6 +244,7 @@ class TitleRepositoryImplTest {
         successGetTitleRating(GetType.UPDATE)
         mapTitleWithUpdatedRatingRemoteDtoToDomain()
         mapTitleWithUpdatedRatingDomainToLocalDto()
+        populateLocalData()
 
         SUT.getTitleWithRatingById(TitleDataTest.TITLE_ID) as ResultDomain.Success
 
@@ -274,13 +280,30 @@ class TitleRepositoryImplTest {
         )
     }
 
-    //offline cases
-    //get titles with rating -> success -> titles with rating returned
-    //get titles with rating -> success -> titles with rating returned
+    @Test
+    fun getTitleWithRatingListByGenre_dataCached_cachedDataReturned() = runTest {
+        populateLocalData()
+        mapTitleWithRatingListLocalToDomainDto()
 
-    //end offline cases
+        val titleWithRatingListByGenre =
+            SUT.getTitleWithRatingListByGenre(TitleDataTest.GENRE_DRAMA) as ResultDomain.Success
+
+        coVerify(exactly = 0) { titleRemoteDataSource.getTitleListByGenre(TitleDataTest.GENRE_DRAMA) }
+        assertThat(titleWithRatingListByGenre.data.size, `is`(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN.size))
+        assertThat(titleWithRatingListByGenre.data, `is`(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
+    }
+
 
     //helper methods
+    private fun mapTitleWithRatingListLocalToDomainDto() {
+        every { titleWithRatingListLocalToDomain.map(TitleDataTest.TITLE_WITH_RATING_LOCAL_LIST_DATA) }
+            .returns(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
+    }
+
+    private fun populateLocalData() {
+        titleLocalDataSourceTd.cachedTitlesWithRating = TitleDataTest.TITLE_WITH_RATING_LOCAL_LIST_DATA
+    }
+
     private fun mapTitleWithUpdatedRatingRemoteDtoToDomain() {
         every { titleWithRatingRemoteDtoToDomain.map(TitleDataTest.TITLE_WITH_UPDATED_RATING_REMOTE_DATA) }
             .returns(TitleDomainTest.TITLE_WITH_UPDATED_RATING_DOMAIN)

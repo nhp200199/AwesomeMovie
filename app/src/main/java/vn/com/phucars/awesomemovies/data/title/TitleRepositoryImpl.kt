@@ -12,7 +12,8 @@ class TitleRepositoryImpl(
     private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
     private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
-    private val titlesWithRatingDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
+    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
+    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
 ) : TitleRepository {
     private suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
         val titlesByGenre = titleRemoteDataSource.getTitleListByGenre(genre)
@@ -77,29 +78,35 @@ class TitleRepositoryImpl(
 
     override suspend fun getTitleWithRatingListByGenre(genre: String): ResultDomain<List<TitleWithRatingDomain>> =
         withContext(Dispatchers.IO) {
-            val titlesByGenre = getTitlesByGenre(genre)
-            when (titlesByGenre) {
-                is ResultData.Error -> return@withContext ResultDomain.Error(titlesByGenre.exception)
-                is ResultData.Success -> {
-                    val titlesWithRatingData = titlesByGenre.data.map {
-                        async {
-                            var titleRating = getTitleRating(it.id)
-                            titleRating = when (titleRating) {
-                                is ResultData.Success -> ResultData.Success(titleRating.data)
-                                is ResultData.Error -> ResultData.Success(TitleData.Rating.DEFAULT_VALUE)
+            val localTitles =
+                titleLocalDataSource.getTitleWithRatingListByGenre(genre)
+            if (localTitles.isNotEmpty()) {
+                return@withContext ResultDomain.Success(titleWithRatingLocalDtoToDomain.map(localTitles))
+            } else {
+                val titlesByGenre = getTitlesByGenre(genre)
+                when (titlesByGenre) {
+                    is ResultData.Error -> return@withContext ResultDomain.Error(titlesByGenre.exception)
+                    is ResultData.Success -> {
+                        val titlesWithRatingData = titlesByGenre.data.map {
+                            async {
+                                var titleRating = getTitleRating(it.id)
+                                titleRating = when (titleRating) {
+                                    is ResultData.Success -> ResultData.Success(titleRating.data)
+                                    is ResultData.Error -> ResultData.Success(TitleData.Rating.DEFAULT_VALUE)
+                                }
+                                val titleWithRating = TitleWithRatingRemoteData(
+                                    it.id,
+                                    it.primaryImage,
+                                    it.titleText,
+                                    it.releaseDate,
+                                    titleRating.data
+                                )
+                                return@async titleWithRatingRemoteDtoToDomain.map(titleWithRating)
                             }
-                            val titleWithRating = TitleWithRatingRemoteData(
-                                it.id,
-                                it.primaryImage,
-                                it.titleText,
-                                it.releaseDate,
-                                titleRating.data
-                            )
-                            return@async titleWithRatingRemoteDtoToDomain.map(titleWithRating)
-                        }
-                    }.awaitAll()
-                    titleLocalDataSource.cacheTitlesWithRating(titlesWithRatingDomainToLocalDto.map(titlesWithRatingData))
-                    return@withContext ResultDomain.Success(titlesWithRatingData)
+                        }.awaitAll()
+                        titleLocalDataSource.cacheTitlesWithRating(titleWithRatingListDomainToLocalDto.map(titlesWithRatingData))
+                        return@withContext ResultDomain.Success(titlesWithRatingData)
+                    }
                 }
             }
         }
