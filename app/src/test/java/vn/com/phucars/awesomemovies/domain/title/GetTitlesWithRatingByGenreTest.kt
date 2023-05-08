@@ -12,6 +12,7 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Test
 import vn.com.phucars.awesomemovies.data.title.TitleRepository
 import vn.com.phucars.awesomemovies.domain.ResultDomain
+import vn.com.phucars.awesomemovies.testdata.GenreDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 
@@ -32,17 +33,17 @@ class GetTitlesWithRatingByGenreTest {
         val genreSlot = slot<String>()
         success()
 
-        SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+        SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
 
         coVerify { repository.getTitleWithRatingListByGenre(capture(genreSlot)) }
-        assertThat(genreSlot.captured, `is`(TitleDataTest.GENRE_DRAMA))
+        assertThat(genreSlot.captured, `is`(GenreDataTest.GENRE_DRAMA))
     }
 
     @Test
     fun getTitlesWithRatingByGenre_success_titlesWithRatingByGenreReturned() = runTest {
         success()
 
-        val titles = SUT.getTitlesWithRatingByGenre(TitleDataTest.GENRE_DRAMA)
+        val titles = SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
 
         assertThat(titles, `is`(instanceOf(ResultDomain.Success::class.java)))
     }
@@ -52,7 +53,7 @@ class GetTitlesWithRatingByGenreTest {
     // get rating failed - the title with that is will have default value of ---
 
     private fun success() {
-        coEvery { repository.getTitleWithRatingListByGenre(TitleDataTest.GENRE_DRAMA) }
+        coEvery { repository.getTitleWithRatingListByGenre(GenreDataTest.GENRE_DRAMA) }
             .returns(ResultDomain.Success<List<TitleWithRatingDomain>>(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
 //        every {
 //            mapper.map(TitleDataTest.TITLE_WITH_RATING_REMOTE_LIST_DATA)

@@ -21,13 +21,13 @@ class TitleWithRatingRemoteDtoToDomainTest {
 
     @Test
     fun map_completeTitleWithRatingDto_completeTitleWithRatingDomainReturned() {
-        val result = SUT.map(TitleDataTest.TITLE_WITH_RATING_REMOTE_DATA)
+        val result = SUT.map(TitleDataTest.TITLE_100_YEARS_WITH_RATING_REMOTE_DATA)
 
-        assertThat(result.id, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.id))
-        assertThat(result.imageUrl, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.imageUrl))
-        assertThat(result.titleText, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.titleText))
-        assertThat(result.releaseDate, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.releaseDate))
-        assertThat(result.numVotes, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.numVotes))
-        assertThat(result.averageRating, `is`(TitleDomainTest.TITLE_WITH_RATING_DOMAIN.averageRating))
+        assertThat(result.id, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.id))
+        assertThat(result.imageUrl, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.imageUrl))
+        assertThat(result.titleText, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.titleText))
+        assertThat(result.releaseDate, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.releaseDate))
+        assertThat(result.numVotes, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.numVotes))
+        assertThat(result.averageRating, `is`(TitleDomainTest.TITLE_100_YEARS_WITH_RATING_DOMAIN.averageRating))
     }
 }

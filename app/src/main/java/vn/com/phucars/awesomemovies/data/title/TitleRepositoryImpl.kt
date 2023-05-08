@@ -110,4 +110,8 @@ class TitleRepositoryImpl(
                 }
             }
         }
+
+    override suspend fun getTitleWithRatingListGroupByGenre(): ResultDomain<Map<String, List<TitleWithRatingDomain>>> {
+        TODO("Not yet implemented")
+    }
 }
