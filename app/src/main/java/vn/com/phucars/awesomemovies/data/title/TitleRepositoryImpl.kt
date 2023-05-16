@@ -25,36 +25,15 @@ class TitleRepositoryImpl(
 
     override suspend fun getTitleWithRatingById(id: String): ResultDomain<TitleWithRatingDomain> {
         val titleById = titleRemoteDataSource.getTitleById(id)
-        when (titleById) {
-            is ResultData.Error -> return ResultDomain.Error(titleById.exception)
+        return when (titleById) {
+            is ResultData.Error -> ResultDomain.Error(titleById.exception)
             is ResultData.Success -> {
-                val titleRating = titleRemoteDataSource.getTitleRating(id)
-                when (titleRating) {
-                    is ResultData.Success -> {
-                        val titleWithRating = titleWithRatingRemoteDtoToDomain.map(
-                            TitleWithRatingRemoteData(
-                                titleById.data.results.id,
-                                titleById.data.results.primaryImage,
-                                titleById.data.results.titleText,
-                                titleById.data.results.releaseDate,
-                                titleRating.data.results
-                            )
-                        )
-                        titleLocalDataSource.cacheTitleWithRating(titleWithRatingDomainToLocalDto.map(titleWithRating))
-                        return ResultDomain.Success(titleWithRating)
-                    }
-                    is ResultData.Error -> return ResultDomain.Success(
-                        titleWithRatingRemoteDtoToDomain.map(
-                            TitleWithRatingRemoteData(
-                                titleById.data.results.id,
-                                titleById.data.results.primaryImage,
-                                titleById.data.results.titleText,
-                                titleById.data.results.releaseDate,
-                                TitleData.Rating.DEFAULT_VALUE
-                            )
-                        )
-                    )
+                val titleWithRatingRemoteData = populateTitleWithRating(titleById.data.results)
+                val titleWithRatingDomain = titleWithRatingRemoteDtoToDomain.map(titleWithRatingRemoteData)
+                if (titleWithRatingRemoteData.rating != TitleData.Rating.DEFAULT_VALUE) {
+                    titleLocalDataSource.cacheTitleWithRating(titleWithRatingDomainToLocalDto.map(titleWithRatingDomain))
                 }
+                ResultDomain.Success(titleWithRatingDomain)
             }
         }
     }
@@ -89,19 +68,8 @@ class TitleRepositoryImpl(
                     is ResultData.Success -> {
                         val titlesWithRatingData = titlesByGenre.data.map {
                             async {
-                                var titleRating = getTitleRating(it.id)
-                                titleRating = when (titleRating) {
-                                    is ResultData.Success -> ResultData.Success(titleRating.data)
-                                    is ResultData.Error -> ResultData.Success(TitleData.Rating.DEFAULT_VALUE)
-                                }
-                                val titleWithRating = TitleWithRatingRemoteData(
-                                    it.id,
-                                    it.primaryImage,
-                                    it.titleText,
-                                    it.releaseDate,
-                                    titleRating.data
-                                )
-                                return@async titleWithRatingRemoteDtoToDomain.map(titleWithRating)
+                                val titleWithRating = populateTitleWithRating(it)
+                                titleWithRatingRemoteDtoToDomain.map(titleWithRating)
                             }
                         }.awaitAll()
                         titleLocalDataSource.cacheTitlesWithRating(titleWithRatingListDomainToLocalDto.map(titlesWithRatingData))
@@ -112,6 +80,61 @@ class TitleRepositoryImpl(
         }
 
     override suspend fun getTitleWithRatingListGroupByGenre(): ResultDomain<Map<String, List<TitleWithRatingDomain>>> {
-        TODO("Not yet implemented")
+        return withContext(Dispatchers.IO) {
+            val genres = titleRemoteDataSource.getGenres()
+            if (genres is ResultData.Success) {
+                return@withContext try {
+                    coroutineScope {
+                        val titleWithRatingListGroupByGenre = genres.data.results.filterNotNull()
+                            .map { genre ->
+                                async {
+                                    val titleListByGenre =
+                                        titleRemoteDataSource.getTitleListByGenre(genre)
+                                    if (titleListByGenre is ResultData.Success) {
+                                        val titleWithRatingListByGenre = titleListByGenre.data.results.map {
+                                            async {
+                                                val titleWithRatingRemoteData =
+                                                    populateTitleWithRating(it)
+                                                titleWithRatingRemoteData
+                                                titleWithRatingRemoteDtoToDomain.map(
+                                                    titleWithRatingRemoteData
+                                                )
+                                            }
+                                        }.awaitAll()
+
+                                        Pair(genre, titleWithRatingListByGenre)
+                                    } else {
+                                        throw (titleListByGenre as ResultData.Error).exception
+                                    }
+                                }
+                            }.awaitAll()
+                        return@coroutineScope ResultDomain.Success<Map<String, List<TitleWithRatingDomain>>>(
+                            mapOf(*titleWithRatingListGroupByGenre.toTypedArray())
+                        )
+                    }
+                } catch (e: Exception) {
+                    return@withContext ResultDomain.Error(e)
+                }
+            } else {
+                return@withContext ResultDomain.Error((genres as ResultData.Error).exception)
+            }
+        }
+    }
+
+    private suspend fun populateTitleWithRating(title: TitleData): TitleWithRatingRemoteData {
+        var titleRating = getTitleRating(title.id)
+        titleRating = when (titleRating) {
+            is ResultData.Success -> ResultData.Success(
+            titleRating.data
+            )
+            is ResultData.Error -> ResultData.Success(TitleData.Rating.DEFAULT_VALUE)
+        }
+        return TitleWithRatingRemoteData(
+            title.id,
+            title.primaryImage,
+            title.titleText,
+            title.releaseDate,
+            titleRating.data
+        )
     }
 }

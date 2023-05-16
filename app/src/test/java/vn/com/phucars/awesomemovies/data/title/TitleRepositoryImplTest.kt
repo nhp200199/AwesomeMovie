@@ -58,16 +58,38 @@ class TitleRepositoryImplTest {
         )
     }
 
-    //get titles sorted in genre
-    @Ignore
     @Test
     fun getTitleWithRatingListGroupByGenre_success_titleWithRatingListReturned() = runTest {
         successGetGenres()
         successGetTitleListByGenre()
+        successGetTitleRating()
+        mapTitleWithRatingRemoteDtoToDomain()
+//        mapTitleWithRatingListDomainToLocalDto()
+
+        var titleWithRatingListGroupByGenre = SUT.getTitleWithRatingListGroupByGenre()
+
+        assertThat(titleWithRatingListGroupByGenre, `is`(instanceOf(ResultDomain.Success::class.java)))
+        titleWithRatingListGroupByGenre = titleWithRatingListGroupByGenre as ResultDomain.Success
+        assertThat(titleWithRatingListGroupByGenre.data.size, `is`(GenreDataTest.GENRES_LIST.size - 1))
+    }
+
+    @Test
+    fun getTitleWithRatingListGroupByGenre_generalErrorGetGenre_generaErrorReturned() = runTest {
+        generalErrorGetGenre()
 
         val titleWithRatingListGroupByGenre = SUT.getTitleWithRatingListGroupByGenre()
 
-        assertThat(titleWithRatingListGroupByGenre, `is`(instanceOf(ResultDomain.Success::class.java)))
+        assertThat(titleWithRatingListGroupByGenre, `is`(instanceOf(ResultDomain.Error::class.java)))
+    }
+
+    @Test
+    fun getTitleWithRatingListGroupByGenre_generalErrorGetTitleList_generaErrorReturned() = runTest {
+        successGetGenres()
+        generalErrorGetTitleListByGenre()
+
+        val titleWithRatingListGroupByGenre = SUT.getTitleWithRatingListGroupByGenre()
+
+        assertThat(titleWithRatingListGroupByGenre, `is`(instanceOf(ResultDomain.Error::class.java)))
     }
 
     @Test
