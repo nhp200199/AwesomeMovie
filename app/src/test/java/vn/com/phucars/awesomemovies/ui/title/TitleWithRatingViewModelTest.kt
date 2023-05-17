@@ -17,7 +17,7 @@ import org.junit.Test
 import vn.com.phucars.awesomemovies.StandardTestDispatcherProvider
 import vn.com.phucars.awesomemovies.CoroutineTestRule
 import vn.com.phucars.awesomemovies.domain.ResultDomain
-import vn.com.phucars.awesomemovies.domain.title.GetTitlesWithRatingByGenre
+import vn.com.phucars.awesomemovies.domain.title.GetTitleWithRatingListGroupByGenre
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 import vn.com.phucars.awesomemovies.ui.ResultViewState
 
@@ -28,10 +28,10 @@ class TitleWithRatingViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     lateinit var SUT: TitleWithRatingViewModel
-    lateinit var getTitlesWithRatingByGenre: GetTitlesWithRatingByGenre
+    lateinit var getTitlesWithRatingByGenre: GetTitleWithRatingListGroupByGenre
     @Before
     fun setup() {
-        getTitlesWithRatingByGenre = mockk<GetTitlesWithRatingByGenre>()
+        getTitlesWithRatingByGenre = mockk<GetTitleWithRatingListGroupByGenre>()
         SUT = TitleWithRatingViewModel(getTitlesWithRatingByGenre, StandardTestDispatcherProvider())
     }
 
@@ -47,11 +47,11 @@ class TitleWithRatingViewModelTest {
 
     @Test
     fun initialize_emitLoadingViewState() = runTest(Job()) {
-        coEvery { getTitlesWithRatingByGenre.getTitlesWithRatingByGenre(ofType(String::class)) }
+        coEvery { getTitlesWithRatingByGenre.getTitleWithRatingListGroupByGenre() }
             .coAnswers {
                 //suspend the coroutine to test loading value
                 delay(1000L)
-                ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
+                ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_GROUP_BY_GENRE)
             }
 
         SUT.initialize()
@@ -71,12 +71,12 @@ class TitleWithRatingViewModelTest {
     }
 
     private fun failure() {
-        coEvery { getTitlesWithRatingByGenre.getTitlesWithRatingByGenre(ofType(String::class)) }
+        coEvery { getTitlesWithRatingByGenre.getTitleWithRatingListGroupByGenre() }
             .returns(ResultDomain.Error(Exception()))
     }
 
     private fun success() {
-        coEvery { getTitlesWithRatingByGenre.getTitlesWithRatingByGenre(ofType(String::class)) }
-            .returns(ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
+        coEvery { getTitlesWithRatingByGenre.getTitleWithRatingListGroupByGenre() }
+            .returns(ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_GROUP_BY_GENRE))
     }
 }

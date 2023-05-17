@@ -2,7 +2,6 @@ package vn.com.phucars.awesomemovies.testdata
 
 import vn.com.phucars.awesomemovies.data.title.TitleData
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
-import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingRemoteDtoToDomain
 
 class TitleDomainTest {
     companion object {
@@ -77,6 +76,11 @@ class TitleDomainTest {
             "${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.day}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.month}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.year}",
             RatingDataTest.UPDATE_TITLE_100_YEARS_RATING.averageRating,
             RatingDataTest.UPDATE_TITLE_100_YEARS_RATING.numVotes,
+        )
+
+        val TITLE_WITH_RATING_LIST_GROUP_BY_GENRE = mapOf(
+            Pair(GenreDataTest.GENRE_DRAMA, listOf(TITLE_100_YEARS_WITH_RATING_DOMAIN, TITLE_CUONG_WITH_RATING_DOMAIN)),
+            Pair(GenreDataTest.GENRE_ACTION, listOf(TITLE_DUNG_WITH_RATING_DOMAIN, TITLE_PHUC_WITH_RATING_DOMAIN))
         )
     }
 }

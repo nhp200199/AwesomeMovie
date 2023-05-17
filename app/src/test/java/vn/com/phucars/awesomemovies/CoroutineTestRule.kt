@@ -13,7 +13,7 @@ class CoroutineTestRule(val testDispatcher: TestDispatcher = UnconfinedTestDispa
     TestCoroutineScheduler()
 )): TestWatcher() {
 
-    val unconfinedTestDispatcherProvider = object : DispatcherProvider {
+    val testDispatcherProvider = object : DispatcherProvider {
         override fun default(): CoroutineDispatcher = testDispatcher
         override fun io(): CoroutineDispatcher = testDispatcher
         override fun main(): CoroutineDispatcher = testDispatcher
