@@ -1,19 +1,23 @@
 package vn.com.phucars.awesomemovies.data.title
 
+import android.util.Log
 import kotlinx.coroutines.*
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.ListMapper
 import vn.com.phucars.awesomemovies.mapper.Mapper
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.*
 
 class TitleRepositoryImpl(
     private val titleRemoteDataSource: TitleRemoteDataSource,
-    private val titleLocalDataSource: TitleLocalDataSource,
+//    private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
-    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
-    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
-    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
+//    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
+//    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
+//    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
 ) : TitleRepository {
     private suspend fun getTitlesByGenre(genre: String): ResultData<List<TitleData>> {
         val titlesByGenre = titleRemoteDataSource.getTitleListByGenre(genre)
@@ -30,9 +34,9 @@ class TitleRepositoryImpl(
             is ResultData.Success -> {
                 val titleWithRatingRemoteData = populateTitleWithRating(titleById.data.results)
                 val titleWithRatingDomain = titleWithRatingRemoteDtoToDomain.map(titleWithRatingRemoteData)
-                if (titleWithRatingRemoteData.rating != TitleData.Rating.DEFAULT_VALUE) {
-                    titleLocalDataSource.cacheTitleWithRating(titleWithRatingDomainToLocalDto.map(titleWithRatingDomain))
-                }
+//                if (titleWithRatingRemoteData.rating != TitleData.Rating.DEFAULT_VALUE) {
+//                    titleLocalDataSource.cacheTitleWithRating(titleWithRatingDomainToLocalDto.map(titleWithRatingDomain))
+//                }
                 ResultDomain.Success(titleWithRatingDomain)
             }
         }
@@ -57,24 +61,38 @@ class TitleRepositoryImpl(
 
     override suspend fun getTitleWithRatingListByGenre(genre: String): ResultDomain<List<TitleWithRatingDomain>> =
         withContext(Dispatchers.IO) {
-            val localTitles =
-                titleLocalDataSource.getTitleWithRatingListByGenre(genre)
-            if (localTitles.isNotEmpty()) {
-                return@withContext ResultDomain.Success(titleWithRatingLocalDtoToDomain.map(localTitles))
-            } else {
-                val titlesByGenre = getTitlesByGenre(genre)
-                when (titlesByGenre) {
-                    is ResultData.Error -> return@withContext ResultDomain.Error(titlesByGenre.exception)
-                    is ResultData.Success -> {
-                        val titlesWithRatingData = titlesByGenre.data.map {
-                            async {
-                                val titleWithRating = populateTitleWithRating(it)
-                                titleWithRatingRemoteDtoToDomain.map(titleWithRating)
-                            }
-                        }.awaitAll()
-                        titleLocalDataSource.cacheTitlesWithRating(titleWithRatingListDomainToLocalDto.map(titlesWithRatingData))
-                        return@withContext ResultDomain.Success(titlesWithRatingData)
-                    }
+//            val localTitles =
+//                titleLocalDataSource.getTitleWithRatingListByGenre(genre)
+//            if (localTitles.isNotEmpty()) {
+//                return@withContext ResultDomain.Success(titleWithRatingLocalDtoToDomain.map(localTitles))
+//            } else {
+//                val titlesByGenre = getTitlesByGenre(genre)
+//                when (titlesByGenre) {
+//                    is ResultData.Error -> return@withContext ResultDomain.Error(titlesByGenre.exception)
+//                    is ResultData.Success -> {
+//                        val titlesWithRatingData = titlesByGenre.data.map {
+//                            async {
+//                                val titleWithRating = populateTitleWithRating(it)
+//                                titleWithRatingRemoteDtoToDomain.map(titleWithRating)
+//                            }
+//                        }.awaitAll()
+//                        titleLocalDataSource.cacheTitlesWithRating(titleWithRatingListDomainToLocalDto.map(titlesWithRatingData))
+//                        return@withContext ResultDomain.Success(titlesWithRatingData)
+//                    }
+//                }
+//            }
+
+            val titlesByGenre = getTitlesByGenre(genre)
+            when (titlesByGenre) {
+                is ResultData.Error -> return@withContext ResultDomain.Error(titlesByGenre.exception)
+                is ResultData.Success -> {
+                    val titlesWithRatingData = titlesByGenre.data.map {
+                        async {
+                            val titleWithRating = populateTitleWithRating(it)
+                            titleWithRatingRemoteDtoToDomain.map(titleWithRating)
+                        }
+                    }.awaitAll()
+                    return@withContext ResultDomain.Success(titlesWithRatingData)
                 }
             }
         }
@@ -95,7 +113,6 @@ class TitleRepositoryImpl(
                                             async {
                                                 val titleWithRatingRemoteData =
                                                     populateTitleWithRating(it)
-                                                titleWithRatingRemoteData
                                                 titleWithRatingRemoteDtoToDomain.map(
                                                     titleWithRatingRemoteData
                                                 )

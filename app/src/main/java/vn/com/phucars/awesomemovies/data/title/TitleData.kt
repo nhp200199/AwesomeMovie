@@ -2,7 +2,7 @@ package vn.com.phucars.awesomemovies.data.title
 
 data class TitleData(
     val id: String,
-    val primaryImage: PrimaryImage,
+    val primaryImage: PrimaryImage?,
     val titleText: TitleText,
     val releaseDate: ReleaseDate
 ) {

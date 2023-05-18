@@ -94,7 +94,7 @@ class TitleDataTest {
 
         val TITLE_100_YEARS_WITH_RATING_LOCAL_DATA = TitleWithRatingLocalData(
             TITLE_100_YEARS_ID,
-            TITLE_100_YEARS_DATA.primaryImage.url,
+            TITLE_100_YEARS_DATA.primaryImage!!.url,
             TITLE_100_YEARS_DATA.titleText.text,
             "${TITLE_100_YEARS_DATA.releaseDate.day}-${TITLE_100_YEARS_DATA.releaseDate.month}-${TITLE_100_YEARS_DATA.releaseDate.year}",
             TITLE_100_YEARS_RATING.averageRating,
@@ -103,7 +103,7 @@ class TitleDataTest {
 
         val TITLE_CUONG_WITH_RATING_LOCAL_DATA = TitleWithRatingLocalData(
             TITLE_CUONG_ID,
-            TITLE_CUONG_DATA.primaryImage.url,
+            TITLE_CUONG_DATA.primaryImage!!.url,
             TITLE_CUONG_DATA.titleText.text,
             "${TITLE_CUONG_DATA.releaseDate.day}-${TITLE_CUONG_DATA.releaseDate.month}-${TITLE_CUONG_DATA.releaseDate.year}",
             TITLE_100_YEARS_RATING.averageRating,
@@ -112,7 +112,7 @@ class TitleDataTest {
 
         val TITLE_100_YEARS_WITH_DEFAULT_RATING_LOCAL_DATA = TitleWithRatingLocalData(
             TITLE_100_YEARS_ID,
-            TITLE_100_YEARS_DATA.primaryImage.url,
+            TITLE_100_YEARS_DATA.primaryImage!!.url,
             TITLE_100_YEARS_DATA.titleText.text,
             "${TITLE_100_YEARS_DATA.releaseDate.day}-${TITLE_100_YEARS_DATA.releaseDate.month}-${TITLE_100_YEARS_DATA.releaseDate.year}",
             TitleData.Rating.DEFAULT_VALUE.averageRating,
@@ -130,7 +130,7 @@ class TitleDataTest {
 
         val TITLE_100_YEARS_WITH_UPDATED_RATING_LOCAL_DATA: TitleWithRatingLocalData = TitleWithRatingLocalData(
             TITLE_100_YEARS_ID,
-            TITLE_100_YEARS_DATA.primaryImage.url,
+            TITLE_100_YEARS_DATA.primaryImage!!.url,
             TITLE_100_YEARS_DATA.titleText.text,
             "${TITLE_100_YEARS_DATA.releaseDate.day}-${TITLE_100_YEARS_DATA.releaseDate.month}-${TITLE_100_YEARS_DATA.releaseDate.year}",
             UPDATE_TITLE_100_YEARS_RATING.averageRating,

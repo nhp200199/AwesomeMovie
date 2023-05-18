@@ -1,5 +1,6 @@
 package vn.com.phucars.awesomemovies.domain.title
 
+import vn.com.phucars.awesomemovies.data.title.TitleData
 import vn.com.phucars.awesomemovies.mapper.Mapper
 import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
 
@@ -7,11 +8,11 @@ class TitleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleW
     override fun map(input: TitleWithRatingRemoteData): TitleWithRatingDomain {
         return TitleWithRatingDomain(
             input.id,
-            input.primaryImage.url,
+            input.primaryImage?.url ?: "",
             input.titleText.text,
-            "${input.releaseDate.day}-${input.releaseDate.month}-${input.releaseDate.year}",
-            input.rating.averageRating,
-            input.rating.numVotes
+            if (input.releaseDate != null) "${input.releaseDate.day}-${input.releaseDate.month}-${input.releaseDate.year}" else "---",
+            input.rating?.averageRating ?: TitleData.Rating.DEFAULT_VALUE.averageRating,
+            input.rating?.numVotes ?: TitleData.Rating.DEFAULT_VALUE.numVotes
         )
     }
 }
