@@ -1,4 +1,6 @@
-package vn.com.phucars.awesomemovies.data.title
+package vn.com.phucars.awesomemovies.data.title.source.local
+
+import vn.com.phucars.awesomemovies.data.title.TitleWithRatingLocalData
 
 interface TitleLocalDataSource {
     suspend fun cacheTitlesWithRating(data: List<TitleWithRatingLocalData>)

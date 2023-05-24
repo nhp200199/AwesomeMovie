@@ -1,12 +1,11 @@
-package vn.com.phucars.awesomemovies.data.title
+package vn.com.phucars.awesomemovies.data.title.source.remote
 
-import okhttp3.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
-import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.common.remote.NetworkResponse
+import vn.com.phucars.awesomemovies.data.title.TitleData
 
 interface TitleService {
     @GET("/titles")

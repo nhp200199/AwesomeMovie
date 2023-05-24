@@ -1,7 +1,6 @@
 package vn.com.phucars.awesomemovies.data.title
 
-import vn.com.phucars.awesomemovies.testdata.TitleDataTest
-import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
+import vn.com.phucars.awesomemovies.data.title.source.local.TitleLocalDataSource
 
 class TitleLocalDataSourceTd : TitleLocalDataSource {
     var cachedTitlesWithRating: List<TitleWithRatingLocalData> = emptyList()

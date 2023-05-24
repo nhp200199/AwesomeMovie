@@ -1,11 +1,16 @@
-package vn.com.phucars.awesomemovies.data.title
+package vn.com.phucars.awesomemovies.data.title.source.remote
 
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
 import vn.com.phucars.awesomemovies.data.common.remote.NetworkResponse
+import vn.com.phucars.awesomemovies.data.title.TitleData
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleService
+import javax.inject.Inject
 
-class TitleRemoteDataSourceImpl(private val titleService: TitleService) : TitleRemoteDataSource {
+class TitleRemoteDataSourceImpl @Inject constructor(private val titleService: TitleService) :
+    TitleRemoteDataSource {
     override suspend fun getTitleListByGenre(genre: String): ResultData<BaseNetworkData<List<TitleData>>> =
         when (val titleListResult = titleService.getTitleListByGenre(genre)) {
             is NetworkResponse.ApiError -> ResultData.Error(UnknownException())

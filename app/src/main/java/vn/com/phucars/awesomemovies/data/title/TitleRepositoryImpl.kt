@@ -1,17 +1,15 @@
 package vn.com.phucars.awesomemovies.data.title
 
-import android.util.Log
 import kotlinx.coroutines.*
 import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
-import vn.com.phucars.awesomemovies.mapper.ListMapper
 import vn.com.phucars.awesomemovies.mapper.Mapper
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 
-class TitleRepositoryImpl(
+class TitleRepositoryImpl @Inject constructor(
     private val titleRemoteDataSource: TitleRemoteDataSource,
 //    private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
