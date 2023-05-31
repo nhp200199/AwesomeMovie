@@ -49,14 +49,22 @@ class GetTitlesWithRatingByGenreTest {
     }
 
     //get titles with rating by genre - get titles fail - return error result
+    @Test
+    fun getTitlesWithRatingByGenre_generalError_errorResultReturned() = runTest {
+        generalError()
 
-    // get rating failed - the title with that is will have default value of ---
+        val titles = SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
+
+        assertThat(titles, `is`(instanceOf(ResultDomain.Error::class.java)))
+    }
 
     private fun success() {
         coEvery { repository.getTitleWithRatingListByGenre(GenreDataTest.GENRE_DRAMA) }
-            .returns(ResultDomain.Success<List<TitleWithRatingDomain>>(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
-//        every {
-//            mapper.map(TitleDataTest.TITLE_WITH_RATING_REMOTE_LIST_DATA)
-//        }.returns(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN)
+            .returns(ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_DOMAIN))
+    }
+
+    private fun generalError() {
+        coEvery { repository.getTitleWithRatingListByGenre(GenreDataTest.GENRE_DRAMA) }
+            .returns(ResultDomain.Error(Exception()))
     }
 }

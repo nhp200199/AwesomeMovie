@@ -48,7 +48,7 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getGenres(): ResultDomain<List<String?>> {
+    override suspend fun getGenres(): ResultDomain<List<String>> {
         val genres = titleRemoteDataSource.getGenres()
         return if (genres is ResultData.Success) {
             ResultDomain.Success(genres.data.results.filterNotNull())

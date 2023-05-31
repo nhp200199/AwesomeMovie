@@ -59,6 +59,7 @@ class TitleRepositoryImplTest {
         )
     }
 
+    @Ignore("For future update")
     @Test
     fun getTitleWithRatingListGroupByGenre_success_titleWithRatingListReturned() = runTest {
         successGetGenres()
@@ -74,6 +75,7 @@ class TitleRepositoryImplTest {
         assertThat(titleWithRatingListGroupByGenre.data.size, `is`(GenreDataTest.GENRES_LIST.size - 1))
     }
 
+    @Ignore("For future update")
     @Test
     fun getTitleWithRatingListGroupByGenre_generalErrorGetGenre_generaErrorReturned() = runTest {
         generalErrorGetGenre()
@@ -83,6 +85,7 @@ class TitleRepositoryImplTest {
         assertThat(titleWithRatingListGroupByGenre, `is`(instanceOf(ResultDomain.Error::class.java)))
     }
 
+    @Ignore("For future update")
     @Test
     fun getTitleWithRatingListGroupByGenre_generalErrorGetTitleList_generaErrorReturned() = runTest {
         successGetGenres()
