@@ -24,8 +24,8 @@ abstract class BaseFragment<T: ViewBinding> : Fragment(){
     protected abstract fun setViewListener()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.i(getClassTag(), "onCreate()")
         super.onCreate(savedInstanceState)
+        Log.i(getClassTag(), "onCreate()")
     }
 
     override fun onCreateView(

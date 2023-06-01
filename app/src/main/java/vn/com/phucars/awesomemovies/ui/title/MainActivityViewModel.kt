@@ -65,4 +65,15 @@ class MainActivityViewModel @Inject constructor(
     fun selectGenre(newGenre: String) {
         selectedGenre.value = newGenre
     }
+
+    fun getSelectedGenre(): Int {
+        var selectedGenreIdx  = 0;
+        for ((index, genre) in genreList.withIndex()) {
+            if (genre == selectedGenre.value) {
+                selectedGenreIdx = index
+                break
+            }
+        }
+        return selectedGenreIdx
+    }
 }
