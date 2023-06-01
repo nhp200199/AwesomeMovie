@@ -28,12 +28,12 @@ class TitleWithRatingViewModel @Inject constructor(
             val titlesWithRatingGroupByGenre =
                 getTitleWithRatingListGroupByGenre.getTitleWithRatingListGroupByGenre()
 
-            if (titlesWithRatingGroupByGenre is ResultDomain.Success) {
-                _titleWithRatingFlow.value = ResultViewState.Success(TitleWithRatingViewState())
-            } else {
-                _titleWithRatingFlow.value =
-                    ResultViewState.Error((titlesWithRatingGroupByGenre as ResultDomain.Error).exception)
-            }
+//            if (titlesWithRatingGroupByGenre is ResultDomain.Success) {
+//                _titleWithRatingFlow.value = ResultViewState.Success(TitleWithRatingViewState())
+//            } else {
+//                _titleWithRatingFlow.value =
+//                    ResultViewState.Error((titlesWithRatingGroupByGenre as ResultDomain.Error).exception)
+//            }
         }
     }
 }

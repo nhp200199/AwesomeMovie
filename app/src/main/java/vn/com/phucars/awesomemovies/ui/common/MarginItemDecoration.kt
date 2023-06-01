@@ -18,7 +18,7 @@ class MarginItemDecoration(
     ) {
         with(outRect) {
             state.itemCount
-            if (parent.layoutManager!!.layoutDirection == LinearLayoutManager.HORIZONTAL) {
+            if (parent.layoutManager!!.canScrollHorizontally()) {
                 right = if(isLastItem(view, parent, state)) {
                     0
                 } else {
