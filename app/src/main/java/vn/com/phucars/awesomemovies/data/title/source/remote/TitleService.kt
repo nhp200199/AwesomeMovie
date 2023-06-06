@@ -4,12 +4,16 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
+import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.common.remote.NetworkResponse
 import vn.com.phucars.awesomemovies.data.title.TitleData
 
 interface TitleService {
     @GET("/titles")
-    suspend fun getTitleListByGenre(@Query("genre") genre: String): NetworkResponse<BaseNetworkData<List<TitleData>>>
+    suspend fun getTitleListByGenre(
+        @Query("genre") genre: String,
+        @Query("page") page: Int
+    ): NetworkResponse<BaseNetworkPagingData<List<TitleData>>>
 
     @GET("/titles/{id}")
     suspend fun getTitleById(@Path("id") id: String): NetworkResponse<BaseNetworkData<TitleData>>

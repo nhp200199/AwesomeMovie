@@ -1,8 +1,15 @@
 package vn.com.phucars.awesomemovies.data.title
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemotePagingDataSource
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.Mapper
@@ -132,6 +139,21 @@ class TitleRepositoryImpl @Inject constructor(
                 }
             } else {
                 return@withContext ResultDomain.Error((genres as ResultData.Error).exception)
+            }
+        }
+    }
+
+    override suspend fun getTitleWithRatingPagingListByGenre(genre: String): Flow<PagingData<TitleWithRatingDomain>> {
+        return Pager(
+            PagingConfig(10, enablePlaceholders = false)
+        ) {
+            TitleRemotePagingDataSource(
+                titleRemoteDataSource,
+                genre
+            )
+        }.flow.map {
+            it.map {
+                titleWithRatingRemoteDtoToDomain.map(it)
             }
         }
     }

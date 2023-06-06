@@ -16,6 +16,7 @@ import org.hamcrest.CoreMatchers.*
 import org.junit.Ignore
 import org.junit.Test
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
+import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.domain.ResultDomain
@@ -450,10 +451,10 @@ class TitleRepositoryImplTest {
         val slot = slot<String>()
         coEvery { titleRemoteDataSource.getTitleListByGenre(capture(slot)) }
             .answers {
-                ResultData.Success<BaseNetworkData<List<TitleData>>>(
+                ResultData.Success<BaseNetworkPagingData<List<TitleData>>>(
                     when (slot.captured) {
-                        GenreDataTest.GENRE_DRAMA -> BaseNetworkData(TitleDataTest.TITLE_GENRE_DRAMA_LIST_DATA)
-                        GenreDataTest.GENRE_ACTION -> BaseNetworkData(TitleDataTest.TITLE_GENRE_ACTION_LIST_DATA)
+                        GenreDataTest.GENRE_DRAMA -> BaseNetworkPagingData(TitleDataTest.TITLE_GENRE_DRAMA_LIST_DATA, "1", "")
+                        GenreDataTest.GENRE_ACTION -> BaseNetworkPagingData(TitleDataTest.TITLE_GENRE_ACTION_LIST_DATA, "1", "")
                         else -> {
                             throw Exception()
                         }

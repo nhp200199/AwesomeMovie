@@ -5,18 +5,20 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
+import androidx.paging.LoadStateAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.databinding.FragmentTitlePageItemBinding
-import vn.com.phucars.awesomemovies.databinding.ItemTitleBinding
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
@@ -26,7 +28,7 @@ private const val ARG_GENRE = "genre"
 @AndroidEntryPoint
 class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
     private var genre: String? = null
-    private lateinit var titleAdapter: BaseRecyclerAdapter<TitleWithRatingViewState, ItemTitleBinding>
+    private lateinit var titleAdapter: TitleWithRatingPagingAdapter
 
     private val viewModel: TitlePageItemViewModel by viewModels()
 
@@ -42,27 +44,45 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
     }
 
     override fun setupView() {
-        titleAdapter = BaseRecyclerAdapter()
+        titleAdapter = TitleWithRatingPagingAdapter(object :
+            DiffUtil.ItemCallback<TitleWithRatingViewState>() {
+            override fun areItemsTheSame(
+                oldItem: TitleWithRatingViewState,
+                newItem: TitleWithRatingViewState
+            ): Boolean {
+                return oldItem.areItemsTheSame(newItem)
+            }
+
+            override fun areContentsTheSame(
+                oldItem: TitleWithRatingViewState,
+                newItem: TitleWithRatingViewState
+            ): Boolean {
+                return oldItem.areContentsTheSame(newItem)
+            }
+
+        })
         binding.rcvTitles.adapter = titleAdapter
-        binding.rcvTitles.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            .withLoadStateFooter(TitleLoadStateAdapter())
+        binding.rcvTitles.layoutManager =
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.rcvTitles.addItemDecoration(MarginItemDecoration(bottom = resources.getDimension(R.dimen.default_margin_vertical_list_item).toInt()))
     }
 
     override fun setViewListener() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.titleWithRatingFlow.collect {
+                viewModel.titleWithRatingFlow.collectLatest {
                     Log.d(getClassTag(), it.toString())
-                    titleAdapter.update(it)
+                    titleAdapter.submitData(it)
                 }
             }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loadingStateFlow.collect {
-                    binding.pbTitle.visibility = if (it) View.VISIBLE else View.GONE
-                    binding.rcvTitles.visibility = if (it) View.GONE else View.VISIBLE
+                titleAdapter.loadStateFlow.collectLatest {
+                    binding.pbTitle.isVisible = it.refresh is LoadState.Loading
+                    binding.rcvTitles.isVisible = it.refresh !is LoadState.Loading
                 }
             }
         }

@@ -1,5 +1,9 @@
 package vn.com.phucars.awesomemovies.data
 
-data class BaseNetworkData<T>(
-    val results: T
-)
+open class BaseNetworkData<T>(
+    open val results: T
+
+
+) {
+    override fun toString(): String  = results.toString()
+}

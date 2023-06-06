@@ -2,7 +2,11 @@ package vn.com.phucars.awesomemovies.ui.title
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
@@ -19,25 +23,17 @@ class TitlePageItemViewModel @Inject constructor(
 ) : ViewModel(){
     private val currentGenre = MutableStateFlow<String>("")
 
-    private val _loadingStateFlow = MutableStateFlow(false)
-    val loadingStateFlow = _loadingStateFlow.asStateFlow()
-
-    private val _titleWithRatingFlow = MutableSharedFlow<List<TitleWithRatingViewState>>()
-    val titleWithRatingFlow = _titleWithRatingFlow.asSharedFlow()
-
-    init {
-        viewModelScope.launch(dispatcherProvider.main()) {
-            currentGenre.filter { it.isNotEmpty() }.collect {
-                _loadingStateFlow.value = true
-                val titlesWithRatingGroupByGenre = getTitlesWithRatingByGenre(it)
-                _loadingStateFlow.value = false
-
-                if (titlesWithRatingGroupByGenre is ResultDomain.Success) {
-                    _titleWithRatingFlow.emit(titlesWithRatingGroupByGenre.data.map { it.toViewState() })
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val titleWithRatingFlow: Flow<PagingData<TitleWithRatingViewState>> =
+        currentGenre.flatMapLatest {
+            getTitlesWithRatingByGenre(it).map { pagingData ->
+                pagingData.map {
+                    it.toViewState()
                 }
             }
-        }
-    }
+        }.cachedIn(viewModelScope)
+
+
 
     fun fetchTitlesForGenre(genre: String) {
         currentGenre.value = genre
