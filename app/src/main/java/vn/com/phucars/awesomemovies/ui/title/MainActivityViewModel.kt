@@ -1,5 +1,6 @@
 package vn.com.phucars.awesomemovies.ui.title
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +38,7 @@ class MainActivityViewModel @Inject constructor(
                 }
             }
         }
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ResultViewState.Initial)
 
     init {
         _genreViewStateFlow.value = ResultViewState.Loading
@@ -75,5 +76,10 @@ class MainActivityViewModel @Inject constructor(
             }
         }
         return selectedGenreIdx
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TitleHome", "onCleared")
     }
 }

@@ -1,5 +1,6 @@
 package vn.com.phucars.awesomemovies.ui.title
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -37,5 +38,10 @@ class TitlePageItemViewModel @Inject constructor(
 
     fun fetchTitlesForGenre(genre: String) {
         currentGenre.value = genre
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("TitlePageItem", "onCleared")
     }
 }

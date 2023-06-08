@@ -7,6 +7,7 @@ import androidx.viewbinding.ViewBinding
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.ui.genre.GenreItemViewHolder
 import vn.com.phucars.awesomemovies.ui.title.TitleItemViewHolder
+import vn.com.phucars.awesomemovies.ui.titleDetail.ActorItemViewHolder
 import java.security.InvalidParameterException
 
 class ViewHolderFactory {
@@ -17,6 +18,7 @@ class ViewHolderFactory {
             return when(layoutId) {
                 R.layout.item_genre -> GenreItemViewHolder(view) as BaseRecyclerViewHolder<T>
                 R.layout.item_title -> TitleItemViewHolder(view) as BaseRecyclerViewHolder<T>
+                R.layout.item_actor_in_title -> ActorItemViewHolder(view) as BaseRecyclerViewHolder<T>
                 else -> throw InvalidParameterException("Cannot find view holder associated with layout id")
             }
         }

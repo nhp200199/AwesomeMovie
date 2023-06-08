@@ -1,23 +1,21 @@
 package vn.com.phucars.awesomemovies.ui.title
 
-import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import vn.com.phucars.awesomemovies.MainActivity
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.databinding.FragmentTitleHomeBinding
 import vn.com.phucars.awesomemovies.databinding.ItemGenreBinding
@@ -53,6 +51,8 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
     override fun setupView() {
         setUpGenreAdapter()
         setUpTitlePageAdapter()
+
+        binding.includeTb.toolbar.title = resources.getString(R.string.app_name)
     }
 
     private fun setUpGenreAdapter() {
@@ -69,9 +69,9 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
     }
 
     private fun setUpTitlePageAdapter() {
-        titlesPagerAdapter = TitlePagerAdapter(this)
+        titlesPagerAdapter = TitlePagerAdapter(childFragmentManager, lifecycle)
         binding.vpTitlePageContainer.adapter = titlesPagerAdapter
-        binding.vpTitlePageContainer.offscreenPageLimit = 2
+//        binding.vpTitlePageContainer.offscreenPageLimit = 0
     }
 
     override fun setViewListener() {
@@ -104,14 +104,15 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         binding.vpTitlePageContainer.unregisterOnPageChangeCallback(pagerChangeCallback)
+        super.onDestroyView()
     }
 
     private inner class TitlePagerAdapter(
-        fa: Fragment,
+        fm: FragmentManager,
+        lifecycle: Lifecycle,
         private var genreList: List<String> = emptyList()
-    ) : FragmentStateAdapter(fa) {
+    ) : FragmentStateAdapter(fm, lifecycle) {
         override fun getItemCount(): Int = genreList.size
 
         override fun createFragment(position: Int): Fragment {

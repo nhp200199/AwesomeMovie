@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,7 @@ import vn.com.phucars.awesomemovies.databinding.FragmentTitlePageItemBinding
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
+import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailFragment
 
 private const val ARG_GENRE = "genre"
 
@@ -60,7 +62,13 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
                 return oldItem.areContentsTheSame(newItem)
             }
 
-        })
+        }) { item ->
+            requireActivity().supportFragmentManager.commit {
+                replace(R.id.main_container, TitleDetailFragment())
+                setReorderingAllowed(true)
+                addToBackStack(null)
+            }
+        }
         binding.rcvTitles.adapter = titleAdapter
             .withLoadStateFooter(TitleLoadStateAdapter())
         binding.rcvTitles.layoutManager =
