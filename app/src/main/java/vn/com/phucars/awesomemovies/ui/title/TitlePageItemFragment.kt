@@ -64,7 +64,7 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
 
         }) { item ->
             requireActivity().supportFragmentManager.commit {
-                replace(R.id.main_container, TitleDetailFragment())
+                replace(R.id.main_container, TitleDetailFragment.newInstance(item.id, item.titleText))
                 setReorderingAllowed(true)
                 addToBackStack(null)
             }

@@ -20,6 +20,7 @@ class TitleRepositoryImpl @Inject constructor(
     private val titleRemoteDataSource: TitleRemoteDataSource,
 //    private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
+    private val newTitleRemoteDataDtoToDomain: Mapper<NewTitleRemoteData, TitleWithRatingDomain>
 //    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
@@ -44,6 +45,28 @@ class TitleRepositoryImpl @Inject constructor(
 //                }
                 ResultDomain.Success(titleWithRatingDomain)
             }
+        }
+    }
+
+    override suspend fun getTitleDetailById(
+        id: String,
+        info: String?
+    ): ResultDomain<TitleWithRatingDomain> {
+        val titleDetailResult = if (info != null) {
+            titleRemoteDataSource.getTitleDetailById(id, info)
+        } else {
+            titleRemoteDataSource.getTitleDetailById(id)
+        }
+
+        return when (titleDetailResult) {
+            is ResultData.Error -> ResultDomain.Error(
+                titleDetailResult.exception
+            )
+            is ResultData.Success -> ResultDomain.Success(
+                newTitleRemoteDataDtoToDomain.map(
+                    titleDetailResult.data.results
+                )
+            )
         }
     }
 

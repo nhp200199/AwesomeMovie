@@ -50,6 +50,35 @@ class TitleDomainTest {
             TitleData.Rating.DEFAULT_VALUE.averageRating,
             TitleData.Rating.DEFAULT_VALUE.numVotes,
         )
+
+        val NEW_TITLE_100_YEARS_DOMAIN = TitleWithRatingDomain(
+            TitleDataTest.TITLE_100_YEARS_ID,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.primaryImage!!.url,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.titleText.text,
+            "${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.day}-${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.month}-${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.year}",
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.ratingsSummary!!.averageRating,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.ratingsSummary!!.numVotes,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.plot!!.plotText.plainText,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.plot!!.trailer,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.genres.genres.map { it.text },
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.principalCast,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.runtime.seconds
+        )
+
+        val NEW_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN = TitleWithRatingDomain(
+            TitleDataTest.TITLE_100_YEARS_ID,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.primaryImage!!.url,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.titleText.text,
+            "${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.day}-${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.month}-${TitleDataTest.NEW_TITLE_100_YEARS_DATA.releaseDate!!.year}",
+            TitleData.Rating.DEFAULT_VALUE.averageRating,
+            TitleData.Rating.DEFAULT_VALUE.numVotes,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.plot!!.plotText.plainText,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.plot!!.trailer,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.genres.genres.map { it.text },
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.principalCast,
+            TitleDataTest.NEW_TITLE_100_YEARS_DATA.runtime.seconds
+        )
+
         val TITLE_PHUC_WITH_DEFAULT_RATING_DOMAIN = TitleWithRatingDomain(
             TitleDataTest.TITLE_PHUC_ID,
             TitleDataTest.TITLE_PHUC_DATA.primaryImage!!.url,

@@ -7,7 +7,7 @@ data class TitleDetailViewState(
     val title: String,
     val genres: List<String>,
     val posterUrl: String,
-    val releaseYear: Int,
+    val releaseYear: String,
     val description: String,
     val castings: List<Actor>,
     val rating: Double,

@@ -2,6 +2,7 @@ package vn.com.phucars.awesomemovies.ui.titleDetail
 
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,58 +11,31 @@ import android.widget.TextView
 import androidx.core.view.marginLeft
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.databinding.FragmentTitleDetailBinding
 import vn.com.phucars.awesomemovies.databinding.ItemActorInTitleBinding
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
 import vn.com.phucars.awesomemovies.ui.common.overrideColor
 import vn.com.phucars.awesomemovies.ui.common.toPx
 
+@AndroidEntryPoint
 class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
-    private val testObject = TitleDetailViewState(
-        "Fast & Furious 9",
-        listOf(
-            "Action",
-            "Crime",
-            "Thriller"
-        ),
-        "https://m.media-amazon.com/images/M/MV5BMjI0NmFkYzEtNzU2YS00NTg5LWIwYmMtNmQ1MTU0OGJjOTMxXkEyXkFqcGdeQXVyMjMxOTE0ODA@._V1_.jpg",
-        2021,
-        "Dom and the crew must take on an international terrorist who turns out to be Dom and Mia's estranged brother.",
-        listOf(
-            Actor(
-                "nm0004874",
-                "https://m.media-amazon.com/images/M/MV5BMjExNzA4MDYxN15BMl5BanBnXkFtZTcwOTI1MDAxOQ@@._V1_.jpg",
-                "Vin Diesel",
-                "Dominic Toretto"
-            ),
-            Actor(
-                "nm0735442",
-                "https://m.media-amazon.com/images/M/MV5BMTkwODIzMzYyMl5BMl5BanBnXkFtZTYwNzAyNjAz._V1_.jpg",
-                "Michelle Rodriguez",
-                "Letty"
-            ),
-            Actor(
-                "nm0108287",
-                "https://m.media-amazon.com/images/M/MV5BMTc1OTMwMzM3NF5BMl5BanBnXkFtZTgwMTM5MzIyODE@._V1_.jpg",
-                "Jordana Brewster",
-                "Mia"
-            ),
-            Actor(
-                "nm0879085",
-                "https://m.media-amazon.com/images/M/MV5BMjA3MjU1NzY4OF5BMl5BanBnXkFtZTgwMzU3MDQxNTE@._V1_.jpg",
-                "Tyrese Gibson",
-                "Roman"
-            ),
-        ),
-        5.2,
-        146681,
-        "8580"
-    )
+    private val viewModel: TitleDetailViewModel by viewModels()
+    private lateinit var titleId: String
+    private lateinit var titleName: String
+    private val actorAdapter = BaseRecyclerAdapter<Actor, ItemActorInTitleBinding>()
 
     override fun getClassTag(): String {
         return TitleDetailFragment::class.java.simpleName
@@ -75,31 +49,53 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     }
 
     override fun setupView() {
-        binding.apply {
-            Glide.with(requireContext())
-                .load(testObject.posterUrl)
-                .into(ivPoster)
-
-            tvDurationContent.text = testObject.duration
-            tvReleaseDateContent.text = testObject.releaseYear.toString()
-            tvDescription.text = testObject.description
-            tvRatingContent.text = "${testObject.rating} (${testObject.voteCount} votes)"
-
-            binding.includeTb.toolbar.apply {
-                title = testObject.title
-                navigationIcon = resources.getDrawable(com.google.android.material.R.drawable.ic_arrow_back_black_24)
-                setNavigationOnClickListener {
-                    requireActivity().onBackPressed()
-                }
-            }
-
-            for (genre in testObject.genres) {
-                val tvGenre: TextView = setUpGenreTextForFlexLayout(genre)
-                binding.flexGenres.addView(tvGenre)
+        binding.includeTb.toolbar.apply {
+            title = this@TitleDetailFragment.titleName
+            navigationIcon = resources.getDrawable(com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            setNavigationOnClickListener {
+                requireActivity().onBackPressed()
             }
         }
 
         setupActorRcvView()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            titleId = it.getString(ARG_TITLE_ID, "")
+            titleName = it.getString(ARG_TITLE_NAME, "")
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewModel.init(titleId, "custom_info")
+        return super.onCreateView(inflater, container, savedInstanceState)
+    }
+
+    private fun updateTitleDetailView(titleDetail: TitleDetailViewState) {
+        binding.apply {
+            Glide.with(requireContext())
+                .load(titleDetail.posterUrl)
+                .into(ivPoster)
+
+            tvDurationContent.text = titleDetail.duration
+            tvReleaseDateContent.text = titleDetail.releaseYear.toString()
+            tvDescription.text = titleDetail.description
+            tvRatingContent.text = "${titleDetail.rating} (${titleDetail.voteCount} votes)"
+
+            actorAdapter.update(titleDetail.castings)
+
+            for (genre in titleDetail.genres) {
+                val tvGenre: TextView = setUpGenreTextForFlexLayout(genre)
+                binding.flexGenres.addView(tvGenre)
+            }
+        }
     }
 
     private fun setUpGenreTextForFlexLayout(genre: String): TextView {
@@ -122,9 +118,8 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     }
 
     private fun setupActorRcvView() {
-        val adapter = BaseRecyclerAdapter<Actor, ItemActorInTitleBinding>(testObject.castings)
         binding.rcvCastings.apply {
-            this.adapter = adapter
+            this.adapter = this@TitleDetailFragment.actorAdapter
             this.layoutManager =
                 LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
             this.addItemDecoration(
@@ -137,7 +132,19 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     }
 
     override fun setViewListener() {
-
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.titleDetailFlow.collect {
+                    Log.d(getClassTag(), it.toString())
+                    when(it) {
+                        is ResultViewState.Error -> {}
+                        ResultViewState.Initial -> {}
+                        ResultViewState.Loading -> {}
+                        is ResultViewState.Success -> updateTitleDetailView(it.data)
+                    }
+                }
+            }
+        }
     }
 
     companion object {

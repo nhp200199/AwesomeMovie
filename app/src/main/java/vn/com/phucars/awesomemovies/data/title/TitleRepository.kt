@@ -11,4 +11,6 @@ interface TitleRepository {
     suspend fun getTitleWithRatingListByGenre(genre: String): ResultDomain<List<TitleWithRatingDomain>>
     suspend fun getTitleWithRatingListGroupByGenre(): ResultDomain<Map<String, List<TitleWithRatingDomain>>>
     suspend fun getTitleWithRatingPagingListByGenre(genre: String): Flow<PagingData<TitleWithRatingDomain>>
+
+    suspend fun getTitleDetailById(id: String, info: String? = null): ResultDomain<TitleWithRatingDomain>
 }
