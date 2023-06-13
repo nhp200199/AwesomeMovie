@@ -9,12 +9,8 @@ import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.GetTitlesWithRatingByGenre
-import vn.com.phucars.awesomemovies.domain.title.toViewState
-import vn.com.phucars.awesomemovies.ui.ResultViewState
 import javax.inject.Inject
 
 @HiltViewModel

@@ -1,8 +1,6 @@
 package vn.com.phucars.awesomemovies.testdata
 
-import vn.com.phucars.awesomemovies.data.title.TitleData
-import vn.com.phucars.awesomemovies.data.title.TitleWithRatingLocalData
-import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
+import vn.com.phucars.awesomemovies.data.title.*
 import vn.com.phucars.awesomemovies.testdata.RatingDataTest.Companion.TITLE_100_YEARS_RATING
 import vn.com.phucars.awesomemovies.testdata.RatingDataTest.Companion.TITLE_CUONG_RATING
 import vn.com.phucars.awesomemovies.testdata.RatingDataTest.Companion.TITLE_DUNG_RATING
@@ -15,6 +13,98 @@ class TitleDataTest {
         val TITLE_CUONG_ID = "tt0001923"
         val TITLE_DUNG_ID = "tt0001924"
         val TITLE_PHUC_ID = "tt0001925"
+
+        val NEW_TITLE_100_YEARS_DATA = NewTitleRemoteData(
+            TITLE_100_YEARS_ID,
+            TITLE_100_YEARS_RATING,
+            TitleData.PrimaryImage("https://m.media-amazon.com/images/M/MV5BMWY3YWY1OTktNjc3Ni00NThiLWI0ODYtOTNjM2E4YjQ2MmJkXkEyXkFqcGdeQXVyMjcyMzI2OTQ@._V1_.jpg"),
+            listOf(
+                PrincipalCast(
+                    listOf(
+                        PrincipalCast.Credit(
+                            PrincipalCast.Credit.Actor(
+                                "123",
+                                PrincipalCast.Credit.Actor.ActorName("Gertrude McCoy"),
+                                PrincipalCast.Credit.Actor.ActorPrimaryImage("https://m.media-amazon.com/images/M/MV5BOTRiYzY0NDktOGUwNS00OWRjLWI2YTAtODhkMjc4MThjODdjL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMzI5NDcxNzI@._V1_.jpg")
+                            ),
+                            listOf(
+                                PrincipalCast.Credit.InTitleCharacter("Winsome Winnie")
+                            )
+                        )
+                    )
+                ),
+                PrincipalCast(
+                    listOf(
+                        PrincipalCast.Credit(
+                            PrincipalCast.Credit.Actor(
+                                "123",
+                                PrincipalCast.Credit.Actor.ActorName("Darwin Karr"),
+                                PrincipalCast.Credit.Actor.ActorPrimaryImage("https://m.media-amazon.com/images/M/MV5BMTIxOWU5MDktNWNjYy00Yjc0LTg5NjMtMzY4YTg5M2NlMWRhXkEyXkFqcGdeQXVyMDUyOTUyNQ@@._V1_.jpg")
+                            ),
+                            listOf(
+                                PrincipalCast.Credit.InTitleCharacter("Winnie's Sweetheart")
+                            )
+                        )
+                    )
+                )
+            ),
+            Genre(
+                listOf(
+                    Genre.GenreInfo("Comedy", "Comedy"),
+                    Genre.GenreInfo("Short", "Short")
+                )
+            ),
+            TitleData.TitleText("100 Years"),
+            TitleData.ReleaseDate(18, 11, 2115),
+            TitleDuration(10),
+            Plot(Plot.PlotText("100 years description"), "100 years trailer url")
+        )
+
+        val NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING = NewTitleRemoteData(
+            TITLE_100_YEARS_ID,
+            null,
+            TitleData.PrimaryImage("https://m.media-amazon.com/images/M/MV5BMWY3YWY1OTktNjc3Ni00NThiLWI0ODYtOTNjM2E4YjQ2MmJkXkEyXkFqcGdeQXVyMjcyMzI2OTQ@._V1_.jpg"),
+            listOf(
+                PrincipalCast(
+                    listOf(
+                        PrincipalCast.Credit(
+                            PrincipalCast.Credit.Actor(
+                                "123",
+                                PrincipalCast.Credit.Actor.ActorName("Gertrude McCoy"),
+                                PrincipalCast.Credit.Actor.ActorPrimaryImage("https://m.media-amazon.com/images/M/MV5BOTRiYzY0NDktOGUwNS00OWRjLWI2YTAtODhkMjc4MThjODdjL2ltYWdlL2ltYWdlXkEyXkFqcGdeQXVyMzI5NDcxNzI@._V1_.jpg")
+                            ),
+                            listOf(
+                                PrincipalCast.Credit.InTitleCharacter("Winsome Winnie")
+                            )
+                        )
+                    )
+                ),
+                PrincipalCast(
+                    listOf(
+                        PrincipalCast.Credit(
+                            PrincipalCast.Credit.Actor(
+                                "123",
+                                PrincipalCast.Credit.Actor.ActorName("Darwin Karr"),
+                                PrincipalCast.Credit.Actor.ActorPrimaryImage("https://m.media-amazon.com/images/M/MV5BMTIxOWU5MDktNWNjYy00Yjc0LTg5NjMtMzY4YTg5M2NlMWRhXkEyXkFqcGdeQXVyMDUyOTUyNQ@@._V1_.jpg")
+                            ),
+                            listOf(
+                                PrincipalCast.Credit.InTitleCharacter("Winnie's Sweetheart")
+                            )
+                        )
+                    )
+                )
+            ),
+            Genre(
+                listOf(
+                    Genre.GenreInfo("Comedy", "Comedy"),
+                    Genre.GenreInfo("Short", "Short")
+                )
+            ),
+            TitleData.TitleText("100 Years"),
+            TitleData.ReleaseDate(18, 11, 2115),
+            TitleDuration(10),
+            Plot(Plot.PlotText("100 years description"), "100 years trailer url")
+        )
 
         val TITLE_100_YEARS_DATA = TitleData(
             TITLE_100_YEARS_ID,

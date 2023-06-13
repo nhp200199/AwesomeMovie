@@ -33,7 +33,7 @@ class GetTitlesWithRatingByGenreTest {
         val genreSlot = slot<String>()
         success()
 
-        SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
+        SUT.invoke(GenreDataTest.GENRE_DRAMA)
 
         coVerify { repository.getTitleWithRatingListByGenre(capture(genreSlot)) }
         assertThat(genreSlot.captured, `is`(GenreDataTest.GENRE_DRAMA))
@@ -43,7 +43,7 @@ class GetTitlesWithRatingByGenreTest {
     fun getTitlesWithRatingByGenre_success_titlesWithRatingByGenreReturned() = runTest {
         success()
 
-        val titles = SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
+        val titles = SUT.invoke(GenreDataTest.GENRE_DRAMA)
 
         assertThat(titles, `is`(instanceOf(ResultDomain.Success::class.java)))
     }
@@ -53,7 +53,7 @@ class GetTitlesWithRatingByGenreTest {
     fun getTitlesWithRatingByGenre_generalError_errorResultReturned() = runTest {
         generalError()
 
-        val titles = SUT.getTitlesWithRatingByGenre(GenreDataTest.GENRE_DRAMA)
+        val titles = SUT.invoke(GenreDataTest.GENRE_DRAMA)
 
         assertThat(titles, `is`(instanceOf(ResultDomain.Error::class.java)))
     }
