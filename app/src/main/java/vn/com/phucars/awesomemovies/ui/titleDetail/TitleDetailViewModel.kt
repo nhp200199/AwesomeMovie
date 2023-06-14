@@ -16,21 +16,18 @@ class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitl
     private val _titleDetailFlow = MutableStateFlow<ResultViewState<TitleDetailViewState>>(ResultViewState.Initial)
     val titleDetailFlow = _titleDetailFlow.asStateFlow()
 
-    init {
-
-    }
-
     fun init(id: String, info: String? = null) {
-        viewModelScope.launch {
-            _titleDetailFlow.value = ResultViewState.Loading
-            val resultDomain = getTitleById.invoke(id, info)
-            val success = when (resultDomain) {
-                is ResultDomain.Error -> TODO()
-                is ResultDomain.Success -> ResultViewState.Success(
-                    resultDomain.data.toDetailViewState()
-                )
+        if (_titleDetailFlow.value == ResultViewState.Initial) {
+            viewModelScope.launch {
+                _titleDetailFlow.value = ResultViewState.Loading
+                val resultViewState = when (val resultDomain = getTitleById.invoke(id, info)) {
+                    is ResultDomain.Error -> TODO()
+                    is ResultDomain.Success -> ResultViewState.Success(
+                        resultDomain.data.toDetailViewState()
+                    )
+                }
+                _titleDetailFlow.value = resultViewState
             }
-            _titleDetailFlow.value = success
         }
     }
 }
