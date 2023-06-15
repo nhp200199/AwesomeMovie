@@ -72,11 +72,14 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel.init(titleId, TitleRemoteDataSource.ParamInfo.CUSTOM_INFO)
+        viewModel.init(titleId)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     private fun updateTitleDetailView(titleDetail: TitleDetailViewState) {
+        //clear all existing genre view first
+        binding.flexGenres.removeAllViews()
+
         binding.apply {
             Glide.with(requireContext())
                 .load(titleDetail.posterUrl)
@@ -130,10 +133,18 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     }
 
     override fun setViewListener() {
+        binding.swlRefreshTitleDetail.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.titleDetailFlow.collect {
                     Log.d(getClassTag(), it.toString())
+                    if (it != ResultViewState.Loading) {
+                        binding.swlRefreshTitleDetail.isRefreshing = false
+                    }
+
                     when(it) {
                         is ResultViewState.Error -> {
                             binding.tvLoadDetailError.isVisible = true

@@ -44,6 +44,7 @@ data class TitleWithRatingDomain(
         } ?: "---"
 
         return TitleDetailViewState(
+            this.id,
             this.titleText,
             this.genres ?: listOf(),
             this.imageUrl,
