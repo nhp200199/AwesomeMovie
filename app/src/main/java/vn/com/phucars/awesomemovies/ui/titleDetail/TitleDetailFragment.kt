@@ -21,6 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.databinding.FragmentTitleDetailBinding
 import vn.com.phucars.awesomemovies.databinding.ItemActorInTitleBinding
 import vn.com.phucars.awesomemovies.ui.ResultViewState
@@ -74,7 +75,7 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel.init(titleId, "custom_info")
+        viewModel.init(titleId, TitleRemoteDataSource.ParamInfo.CUSTOM_INFO)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 

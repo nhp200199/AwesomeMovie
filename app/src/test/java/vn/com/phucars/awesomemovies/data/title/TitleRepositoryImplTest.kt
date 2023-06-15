@@ -73,13 +73,13 @@ class TitleRepositoryImplTest {
         successGetNewTitleData()
         mapNewTitleRemoteDataDtoToDomain()
 
-        SUT.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, "custom_info")
+        SUT.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, TitleRemoteDataSource.ParamInfo.CUSTOM_INFO)
 
         coVerify(exactly = 1) {
             titleRemoteDataSource.getTitleDetailById(capture(idSlot), capture(infoSlot))
         }
         assertThat(idSlot.captured, `is`(TitleDataTest.TITLE_100_YEARS_ID))
-        assertThat(infoSlot.captured, `is`("custom_info"))
+        assertThat(infoSlot.captured, `is`(TitleRemoteDataSource.ParamInfo.CUSTOM_INFO))
     }
 
 
@@ -98,7 +98,7 @@ class TitleRepositoryImplTest {
             titleRemoteDataSource.getTitleDetailById(capture(idSlot), capture(infoSlot))
         }
         assertThat(idSlot.captured, `is`(TitleDataTest.TITLE_100_YEARS_ID))
-        assertThat(infoSlot.captured, `is`("mini_info"))
+        assertThat(infoSlot.captured, `is`(TitleRemoteDataSource.ParamInfo.MINI_INFO))
     }
 
     //get detail title by id - success - detail title returned
@@ -448,12 +448,12 @@ class TitleRepositoryImplTest {
         coEvery { titleRemoteDataSource.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, capture(slot)) }
             .answers {
                 when (slot.captured) {
-                    "custom_info" -> ResultData.Success(
+                    TitleRemoteDataSource.ParamInfo.CUSTOM_INFO -> ResultData.Success(
                         BaseNetworkData(
                             TitleDataTest.NEW_TITLE_100_YEARS_DATA
                         )
                     )
-                    "mini_info" -> ResultData.Success(
+                    TitleRemoteDataSource.ParamInfo.MINI_INFO -> ResultData.Success(
                         BaseNetworkData(
                             TitleDataTest.NEW_TITLE_100_YEARS_DATA
                         )
