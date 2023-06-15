@@ -21,7 +21,7 @@ class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitl
             viewModelScope.launch {
                 _titleDetailFlow.value = ResultViewState.Loading
                 val resultViewState = when (val resultDomain = getTitleById.invoke(id, info)) {
-                    is ResultDomain.Error -> TODO()
+                    is ResultDomain.Error -> ResultViewState.Error(resultDomain.exception)
                     is ResultDomain.Success -> ResultViewState.Success(
                         resultDomain.data.toDetailViewState()
                     )

@@ -1,15 +1,13 @@
 package vn.com.phucars.awesomemovies.ui.titleDetail
 
-import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.core.view.marginLeft
-import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -18,7 +16,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
@@ -138,10 +135,24 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
                 viewModel.titleDetailFlow.collect {
                     Log.d(getClassTag(), it.toString())
                     when(it) {
-                        is ResultViewState.Error -> {}
+                        is ResultViewState.Error -> {
+                            binding.tvLoadDetailError.isVisible = true
+                            binding.titleInfoDetailContainer.isVisible = false
+                            binding.pbTitleDetail.isVisible = false
+                        }
                         ResultViewState.Initial -> {}
-                        ResultViewState.Loading -> {}
-                        is ResultViewState.Success -> updateTitleDetailView(it.data)
+                        ResultViewState.Loading -> {
+                            binding.pbTitleDetail.isVisible = true
+                            binding.titleInfoDetailContainer.isVisible = false
+                            binding.tvLoadDetailError.isVisible = false
+                        }
+                        is ResultViewState.Success -> {
+                            binding.titleInfoDetailContainer.isVisible = true
+                            binding.pbTitleDetail.isVisible = false
+                            binding.tvLoadDetailError.isVisible = false
+
+                            updateTitleDetailView(it.data)
+                        }
                     }
                 }
             }
