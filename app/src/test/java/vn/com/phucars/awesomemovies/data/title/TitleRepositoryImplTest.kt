@@ -309,9 +309,9 @@ class TitleRepositoryImplTest {
                 titleWithRatingListByGenre.data.size,
                 `is`(TitleDataTest.TITLE_WITH_RATING_REMOTE_LIST_DATA.size)
             )
-            val idx = titleWithRatingListByGenre.data.findLast { it.id == TitleDataTest.TITLE_100_YEARS_ID }
-            assertThat(idx!!.averageRating, `is`(TitleData.Rating.DEFAULT_VALUE.averageRating))
-            assertThat(idx!!.numVotes, `is`(TitleData.Rating.DEFAULT_VALUE.numVotes))
+            val titleWithDefaultRating = titleWithRatingListByGenre.data.findLast { it.id == TitleDataTest.TITLE_100_YEARS_ID }
+            assertThat(titleWithDefaultRating!!.averageRating, `is`(TitleData.Rating.DEFAULT_VALUE.averageRating))
+            assertThat(titleWithDefaultRating!!.numVotes, `is`(TitleData.Rating.DEFAULT_VALUE.numVotes))
         }
 
     @Ignore

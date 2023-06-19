@@ -3,7 +3,7 @@ package vn.com.phucars.awesomemovies.data.title.source.remote
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
-import vn.com.phucars.awesomemovies.data.title.NewTitleRemoteData
+import vn.com.phucars.awesomemovies.data.title.DetailTitleRemoteData
 import vn.com.phucars.awesomemovies.data.title.TitleData
 
 interface TitleRemoteDataSource {
@@ -18,5 +18,5 @@ interface TitleRemoteDataSource {
     suspend fun getTitleRating(titleId: String): ResultData<BaseNetworkData<TitleData.Rating>>
     suspend fun getGenres(): ResultData<BaseNetworkData<List<String?>>>
 
-    suspend fun getTitleDetailById(id: String, info: String = ParamInfo.MINI_INFO): ResultData<BaseNetworkData<NewTitleRemoteData>>
+    suspend fun getTitleDetailById(id: String, info: String = ParamInfo.MINI_INFO): ResultData<BaseNetworkData<DetailTitleRemoteData>>
 }

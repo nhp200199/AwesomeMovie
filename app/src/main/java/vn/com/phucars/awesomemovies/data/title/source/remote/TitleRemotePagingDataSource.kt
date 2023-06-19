@@ -24,7 +24,7 @@ class TitleRemotePagingDataSource @Inject constructor(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, TitleWithRatingRemoteData> {
-        val start = params.key ?: 1
+        val start = params.key ?: 1 //starts at page 1 if no pages are loaded before
         val titleWithRating = withContext(Dispatchers.IO) {
             val titlesByGenre = titleRemoteDataSource.getTitleListByGenre(genre, page = start)
             when (titlesByGenre) {
