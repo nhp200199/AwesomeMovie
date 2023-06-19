@@ -20,7 +20,6 @@ import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.domain.ResultDomain
-import vn.com.phucars.awesomemovies.domain.title.NewTitleWithRatingRemoteDtoToDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.ListMapper
 import vn.com.phucars.awesomemovies.mapper.Mapper
@@ -39,7 +38,7 @@ class TitleRepositoryImplTest {
     lateinit var titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>
     lateinit var titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
     lateinit var titleWithRatingListLocalToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
-    lateinit var newTitleWithRatingRemoteDtoToDomain: Mapper<NewTitleRemoteData, TitleWithRatingDomain>
+    lateinit var detailTitleRemoteDtoToDomain: Mapper<DetailTitleRemoteData, TitleWithRatingDomain>
 
     @Before
     fun setup() {
@@ -51,13 +50,13 @@ class TitleRepositoryImplTest {
         titleWithRatingDomainToLocalDto =
             mockk<Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>>()
         titleWithRatingListLocalToDomain = mockk<ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>>()
-        newTitleWithRatingRemoteDtoToDomain = mockk<Mapper<NewTitleRemoteData, TitleWithRatingDomain>>()
+        detailTitleRemoteDtoToDomain = mockk<Mapper<DetailTitleRemoteData, TitleWithRatingDomain>>()
 
         SUT = TitleRepositoryImpl(
             titleRemoteDataSource,
 //            titleLocalDataSourceTd,
             titleWithRatingRemoteDtoToDomain,
-            newTitleWithRatingRemoteDtoToDomain
+            detailTitleRemoteDtoToDomain
 //            titleWithRatingDomainToLocalDto,
 //            titleWithRatingListDomainToLocalDto,
 //            titleWithRatingListLocalToDomain
@@ -418,13 +417,13 @@ class TitleRepositoryImplTest {
 
     //helper methods
     private fun mapNewTitleRemoteDataDtoToDomain() {
-        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA) }
-            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_DOMAIN)
+        every { detailTitleRemoteDtoToDomain.map(TitleDataTest.DETAIL_TITLE_100_YEARS_DATA) }
+            .returns(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN)
     }
 
     private fun mapNewTitleWithNullRatingRemoteDataDtoToDomain() {
-        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING) }
-            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN)
+        every { detailTitleRemoteDtoToDomain.map(TitleDataTest.DETAIL_TITLE_100_YEARS_DATA_WITH_NULL_RATING) }
+            .returns(TitleDomainTest.DETAIL_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN)
     }
 
     private fun successGetNewTitleDataWithNullRating() {
@@ -432,7 +431,7 @@ class TitleRepositoryImplTest {
             .returns(
                 ResultData.Success(
                     BaseNetworkData(
-                        TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING
+                        TitleDataTest.DETAIL_TITLE_100_YEARS_DATA_WITH_NULL_RATING
                     )
                 )
             )
@@ -445,12 +444,12 @@ class TitleRepositoryImplTest {
                 when (slot.captured) {
                     TitleRemoteDataSource.ParamInfo.CUSTOM_INFO -> ResultData.Success(
                         BaseNetworkData(
-                            TitleDataTest.NEW_TITLE_100_YEARS_DATA
+                            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA
                         )
                     )
                     TitleRemoteDataSource.ParamInfo.MINI_INFO -> ResultData.Success(
                         BaseNetworkData(
-                            TitleDataTest.NEW_TITLE_100_YEARS_DATA
+                            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA
                         )
                     )
                     else -> throw Exception("not support param: ${slot.captured}")

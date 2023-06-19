@@ -5,7 +5,7 @@ import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
 import vn.com.phucars.awesomemovies.data.common.remote.NetworkResponse
-import vn.com.phucars.awesomemovies.data.title.NewTitleRemoteData
+import vn.com.phucars.awesomemovies.data.title.DetailTitleRemoteData
 import vn.com.phucars.awesomemovies.data.title.TitleData
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ class TitleRemoteDataSourceImpl @Inject constructor(private val titleService: Ti
     override suspend fun getTitleDetailById(
         id: String,
         info: String
-    ): ResultData<BaseNetworkData<NewTitleRemoteData>> =
+    ): ResultData<BaseNetworkData<DetailTitleRemoteData>> =
         when (val titleDetailResult = titleService.getTitleDetailById(id, info)) {
             is NetworkResponse.ApiError -> ResultData.Error(UnknownException())
             is NetworkResponse.NetworkError -> ResultData.Error(UnknownException())

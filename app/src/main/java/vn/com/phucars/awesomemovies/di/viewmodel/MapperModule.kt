@@ -1,11 +1,10 @@
 package vn.com.phucars.awesomemovies.di.viewmodel
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import vn.com.phucars.awesomemovies.data.title.NewTitleRemoteData
+import vn.com.phucars.awesomemovies.data.title.DetailTitleRemoteData
 import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
 import vn.com.phucars.awesomemovies.domain.title.NewTitleWithRatingRemoteDtoToDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
@@ -19,5 +18,5 @@ object MapperModule {
     fun titleWithRatingRemoteDtoToDomain(): Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain> = TitleWithRatingRemoteDtoToDomain()
 
     @Provides
-    fun newTitleWithRatingRemoteDtoToDomain(): Mapper<NewTitleRemoteData, TitleWithRatingDomain> = NewTitleWithRatingRemoteDtoToDomain()
+    fun newTitleWithRatingRemoteDtoToDomain(): Mapper<DetailTitleRemoteData, TitleWithRatingDomain> = NewTitleWithRatingRemoteDtoToDomain()
 }

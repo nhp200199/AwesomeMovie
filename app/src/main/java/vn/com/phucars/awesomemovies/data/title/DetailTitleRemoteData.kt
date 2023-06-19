@@ -1,6 +1,6 @@
 package vn.com.phucars.awesomemovies.data.title
 
-data class NewTitleRemoteData(
+data class DetailTitleRemoteData(
     val id: String,
     val ratingsSummary: TitleData.Rating?,
     val primaryImage: TitleData.PrimaryImage?,

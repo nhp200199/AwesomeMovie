@@ -20,7 +20,7 @@ class TitleRepositoryImpl @Inject constructor(
     private val titleRemoteDataSource: TitleRemoteDataSource,
 //    private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
-    private val newTitleRemoteDataDtoToDomain: Mapper<NewTitleRemoteData, TitleWithRatingDomain>
+    private val detailTitleRemoteDataDtoToDomain: Mapper<DetailTitleRemoteData, TitleWithRatingDomain>
 //    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
@@ -63,7 +63,7 @@ class TitleRepositoryImpl @Inject constructor(
                 titleDetailResult.exception
             )
             is ResultData.Success -> ResultDomain.Success(
-                newTitleRemoteDataDtoToDomain.map(
+                detailTitleRemoteDataDtoToDomain.map(
                     titleDetailResult.data.results
                 )
             )
