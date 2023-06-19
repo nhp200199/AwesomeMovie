@@ -43,20 +43,31 @@ data class TitleWithRatingDomain(
             return@let "$hour$minute"
         } ?: "---"
 
+        val credits = if (this.castings != null) {
+            if (this.castings.isNotEmpty()) {
+                this.castings[0].credits.map {
+                    Actor(
+                        it.name.id,
+                        it.name.primaryImage?.url ?: "",
+                        it.name.nameText.text,
+                        it.characters?.get(0)?.name ?: "---"
+                    )
+                }
+            } else {
+                listOf()
+            }
+        } else {
+            listOf()
+        }
+
         return TitleDetailViewState(
+            this.id,
             this.titleText,
             this.genres ?: listOf(),
             this.imageUrl,
             this.releaseDate,
             this.description ?: "No information",
-            this.castings?.get(0)?.credits?.map {
-                Actor(
-                    it.name.id,
-                    it.name.primaryImage?.url ?: "",
-                    it.name.nameText.text,
-                    it.characters?.get(0)?.name ?: "---"
-                )
-            } ?: listOf(),
+            credits,
             this.averageRating.toDouble(),
             this.numVotes,
             durationTime

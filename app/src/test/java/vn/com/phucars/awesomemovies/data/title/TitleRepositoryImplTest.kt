@@ -64,7 +64,6 @@ class TitleRepositoryImplTest {
         )
     }
 
-    //get detail title by id - correct id and custom info passed
     @Test
     fun getDetailTitleById_correctIdAndCustomInfoPassed() = runTest {
         val idSlot = slot<String>()
@@ -73,17 +72,16 @@ class TitleRepositoryImplTest {
         successGetNewTitleData()
         mapNewTitleRemoteDataDtoToDomain()
 
-        SUT.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, "custom_info")
+        SUT.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, TitleRemoteDataSource.ParamInfo.CUSTOM_INFO)
 
         coVerify(exactly = 1) {
             titleRemoteDataSource.getTitleDetailById(capture(idSlot), capture(infoSlot))
         }
         assertThat(idSlot.captured, `is`(TitleDataTest.TITLE_100_YEARS_ID))
-        assertThat(infoSlot.captured, `is`("custom_info"))
+        assertThat(infoSlot.captured, `is`(TitleRemoteDataSource.ParamInfo.CUSTOM_INFO))
     }
 
 
-    //get detail title by id - not passing custom info - default custom info used
     @Test
     fun getDetailTitleById_paramInfoNotPassed_correctIdAndDefaultInfoPassed() = runTest {
         val idSlot = slot<String>()
@@ -98,10 +96,9 @@ class TitleRepositoryImplTest {
             titleRemoteDataSource.getTitleDetailById(capture(idSlot), capture(infoSlot))
         }
         assertThat(idSlot.captured, `is`(TitleDataTest.TITLE_100_YEARS_ID))
-        assertThat(infoSlot.captured, `is`("mini_info"))
+        assertThat(infoSlot.captured, `is`(TitleRemoteDataSource.ParamInfo.MINI_INFO))
     }
 
-    //get detail title by id - success - detail title returned
     @Test
     fun getDetailTitleById_success_detailTitleReturned() = runTest {
         successGetNewTitleData()
@@ -112,7 +109,6 @@ class TitleRepositoryImplTest {
         assertThat(titleDetailById, `is`(instanceOf(ResultDomain.Success::class.java)))
     }
 
-    //get detail title by id - success - rating data is null - detail title with default returned
     @Test
     fun getDetailTitleById_success_ratingIsNull_titleDetailWithDefaultRatingReturned() = runTest {
         successGetNewTitleDataWithNullRating()
@@ -126,28 +122,6 @@ class TitleRepositoryImplTest {
         assertThat(titleDetailById.data.numVotes, `is`(TitleData.Rating.DEFAULT_VALUE.numVotes))
     }
 
-    private fun mapNewTitleRemoteDataDtoToDomain() {
-        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA) }
-            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_DOMAIN)
-    }
-
-    private fun mapNewTitleWithNullRatingRemoteDataDtoToDomain() {
-        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING) }
-            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN)
-    }
-
-    private fun successGetNewTitleDataWithNullRating() {
-        coEvery { titleRemoteDataSource.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID) }
-            .returns(
-                ResultData.Success(
-                    BaseNetworkData(
-                        TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING
-                    )
-                )
-            )
-    }
-
-    //get detail title by id - general error - general error returned
     @Test
     fun getDetailTitleById_generalError_generalErrorReturned() = runTest {
         generalErrorGettingTitleDetail()
@@ -443,17 +417,38 @@ class TitleRepositoryImplTest {
 
 
     //helper methods
+    private fun mapNewTitleRemoteDataDtoToDomain() {
+        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA) }
+            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_DOMAIN)
+    }
+
+    private fun mapNewTitleWithNullRatingRemoteDataDtoToDomain() {
+        every { newTitleWithRatingRemoteDtoToDomain.map(TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING) }
+            .returns(TitleDomainTest.NEW_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN)
+    }
+
+    private fun successGetNewTitleDataWithNullRating() {
+        coEvery { titleRemoteDataSource.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID) }
+            .returns(
+                ResultData.Success(
+                    BaseNetworkData(
+                        TitleDataTest.NEW_TITLE_100_YEARS_DATA_WITH_NULL_RATING
+                    )
+                )
+            )
+    }
+
     private fun successGetNewTitleData() {
         val slot = slot<String>()
         coEvery { titleRemoteDataSource.getTitleDetailById(TitleDataTest.TITLE_100_YEARS_ID, capture(slot)) }
             .answers {
                 when (slot.captured) {
-                    "custom_info" -> ResultData.Success(
+                    TitleRemoteDataSource.ParamInfo.CUSTOM_INFO -> ResultData.Success(
                         BaseNetworkData(
                             TitleDataTest.NEW_TITLE_100_YEARS_DATA
                         )
                     )
-                    "mini_info" -> ResultData.Success(
+                    TitleRemoteDataSource.ParamInfo.MINI_INFO -> ResultData.Success(
                         BaseNetworkData(
                             TitleDataTest.NEW_TITLE_100_YEARS_DATA
                         )

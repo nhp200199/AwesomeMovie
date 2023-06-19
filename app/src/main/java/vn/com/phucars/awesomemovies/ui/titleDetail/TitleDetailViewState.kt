@@ -4,6 +4,7 @@ import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.ui.base.adapter.RecyclerViewData
 
 data class TitleDetailViewState(
+    val id: String,
     val title: String,
     val genres: List<String>,
     val posterUrl: String,
