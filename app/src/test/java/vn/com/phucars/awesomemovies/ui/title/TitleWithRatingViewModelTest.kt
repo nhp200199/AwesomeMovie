@@ -46,11 +46,11 @@ class TitleWithRatingViewModelTest {
     }
 
     @Test
-    fun initialize_emitLoadingViewState() = runTest(Job()) {
+    fun initialize_emitLoadingViewState() = runTest {
         coEvery { getTitlesWithRatingByGenre.getTitleWithRatingListGroupByGenre() }
             .coAnswers {
                 //suspend the coroutine to test loading value
-                delay(1000L)
+                delay(1L)
                 ResultDomain.Success(TitleDomainTest.TITLE_WITH_RATING_LIST_GROUP_BY_GENRE)
             }
 

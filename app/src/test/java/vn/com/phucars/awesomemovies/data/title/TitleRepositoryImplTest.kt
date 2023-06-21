@@ -14,11 +14,14 @@ import org.mockito.junit.MockitoJUnitRunner
 
 import org.hamcrest.CoreMatchers.*
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
+import vn.com.phucars.awesomemovies.CoroutineTestRule
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
+import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.ListMapper
@@ -31,6 +34,9 @@ import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class TitleRepositoryImplTest {
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
     lateinit var SUT: TitleRepositoryImpl
     lateinit var titleRemoteDataSource: TitleRemoteDataSource
     val titleLocalDataSourceTd = TitleLocalDataSourceTd()
@@ -39,6 +45,7 @@ class TitleRepositoryImplTest {
     lateinit var titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>
     lateinit var titleWithRatingListLocalToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
     lateinit var detailTitleRemoteDtoToDomain: Mapper<DetailTitleRemoteData, TitleWithRatingDomain>
+    val dispatcherProvider: DispatcherProvider = coroutineTestRule.testDispatcherProvider
 
     @Before
     fun setup() {
@@ -56,7 +63,8 @@ class TitleRepositoryImplTest {
             titleRemoteDataSource,
 //            titleLocalDataSourceTd,
             titleWithRatingRemoteDtoToDomain,
-            detailTitleRemoteDtoToDomain
+            detailTitleRemoteDtoToDomain,
+            dispatcherProvider
 //            titleWithRatingDomainToLocalDto,
 //            titleWithRatingListDomainToLocalDto,
 //            titleWithRatingListLocalToDomain

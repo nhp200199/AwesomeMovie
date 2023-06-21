@@ -16,8 +16,10 @@ import javax.inject.Inject
 class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitleById) : ViewModel() {
     private val _titleDetailFlow = MutableStateFlow<ResultViewState<TitleDetailViewState>>(ResultViewState.Initial)
     val titleDetailFlow = _titleDetailFlow.asStateFlow()
+    lateinit var id: String
 
     fun init(id: String) {
+        this.id = id
         if (_titleDetailFlow.value == ResultViewState.Initial) {
             fetchTitleDetail(id)
         }
@@ -27,7 +29,7 @@ class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitl
         viewModelScope.launch {
             _titleDetailFlow.value = ResultViewState.Loading
             val resultViewState = when (val resultDomain =
-                getTitleById.invoke(id, TitleRemoteDataSource.ParamInfo.CUSTOM_INFO)) {
+                getTitleById(id)) {
                 is ResultDomain.Error -> ResultViewState.Error(resultDomain.exception)
                 is ResultDomain.Success -> ResultViewState.Success(
                     resultDomain.data.toDetailViewState()
@@ -38,9 +40,14 @@ class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitl
     }
 
     fun refresh() {
-        if (_titleDetailFlow.value is ResultViewState.Success) {
-            fetchTitleDetail((_titleDetailFlow.value as ResultViewState.Success).data.id)
+        if (_titleDetailFlow.value is ResultViewState.Success
+            || _titleDetailFlow.value is ResultViewState.Error) {
+            fetchTitleDetail(id)
         }
     }
 
+    //This method is used only for testing
+    fun setTitleDetailState(newState: ResultViewState<TitleDetailViewState>) {
+        _titleDetailFlow.value = newState
+    }
 }

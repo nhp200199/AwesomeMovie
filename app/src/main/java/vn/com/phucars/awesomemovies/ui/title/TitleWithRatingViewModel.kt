@@ -23,17 +23,23 @@ class TitleWithRatingViewModel @Inject constructor(
     val titleWithRatingFlow = _titleWithRatingFlow.asStateFlow()
 
     fun initialize() {
-        _titleWithRatingFlow.value = ResultViewState.Loading
         viewModelScope.launch(dispatcherProvider.main()) {
+            _titleWithRatingFlow.value = ResultViewState.Loading
             val titlesWithRatingGroupByGenre =
                 getTitleWithRatingListGroupByGenre.getTitleWithRatingListGroupByGenre()
 
-//            if (titlesWithRatingGroupByGenre is ResultDomain.Success) {
-//                _titleWithRatingFlow.value = ResultViewState.Success(TitleWithRatingViewState())
-//            } else {
-//                _titleWithRatingFlow.value =
-//                    ResultViewState.Error((titlesWithRatingGroupByGenre as ResultDomain.Error).exception)
-//            }
+            if (titlesWithRatingGroupByGenre is ResultDomain.Success) {
+                _titleWithRatingFlow.value = ResultViewState.Success(TitleWithRatingViewState(
+                    "",
+                    "",
+                    "",
+                    "",
+                    0f, 0
+                ))
+            } else {
+                _titleWithRatingFlow.value =
+                    ResultViewState.Error((titlesWithRatingGroupByGenre as ResultDomain.Error).exception)
+            }
         }
     }
 }

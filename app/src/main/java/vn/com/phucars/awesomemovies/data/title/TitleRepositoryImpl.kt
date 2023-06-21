@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemotePagingDataSource
+import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.Mapper
@@ -20,7 +21,8 @@ class TitleRepositoryImpl @Inject constructor(
     private val titleRemoteDataSource: TitleRemoteDataSource,
 //    private val titleLocalDataSource: TitleLocalDataSource,
     private val titleWithRatingRemoteDtoToDomain: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>,
-    private val detailTitleRemoteDataDtoToDomain: Mapper<DetailTitleRemoteData, TitleWithRatingDomain>
+    private val detailTitleRemoteDataDtoToDomain: Mapper<DetailTitleRemoteData, TitleWithRatingDomain>,
+    private val dispatcherProvider: DispatcherProvider
 //    private val titleWithRatingDomainToLocalDto: Mapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingListDomainToLocalDto: ListMapper<TitleWithRatingDomain, TitleWithRatingLocalData>,
 //    private val titleWithRatingLocalDtoToDomain: ListMapper<TitleWithRatingLocalData, TitleWithRatingDomain>
@@ -52,10 +54,12 @@ class TitleRepositoryImpl @Inject constructor(
         id: String,
         info: String?
     ): ResultDomain<TitleWithRatingDomain> {
-        val titleDetailResult = if (info != null) {
-            titleRemoteDataSource.getTitleDetailById(id, info)
-        } else {
-            titleRemoteDataSource.getTitleDetailById(id)
+        val titleDetailResult = withContext(dispatcherProvider.io()) {
+            if (info != null) {
+                titleRemoteDataSource.getTitleDetailById(id, info)
+            } else {
+                titleRemoteDataSource.getTitleDetailById(id)
+            }
         }
 
         return when (titleDetailResult) {
