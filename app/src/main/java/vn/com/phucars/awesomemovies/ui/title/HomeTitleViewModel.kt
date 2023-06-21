@@ -13,7 +13,7 @@ import vn.com.phucars.awesomemovies.ui.genre.GenreViewState
 import javax.inject.Inject
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(
+class HomeTitleViewModel @Inject constructor(
     private val getGenreListUseCase: GetGenreListUseCase
 ) : ViewModel() {
     private val selectedGenre = MutableStateFlow<String?>(null)
@@ -41,6 +41,10 @@ class MainActivityViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), ResultViewState.Initial)
 
     init {
+        fetchGenres()
+    }
+
+    private fun fetchGenres() {
         _genreViewStateFlow.value = ResultViewState.Loading
         viewModelScope.launch {
             val resultViewState = when (val genreListResult = getGenreListUseCase()) {
@@ -54,6 +58,13 @@ class MainActivityViewModel @Inject constructor(
                 }
             }
             _genreViewStateFlow.value = resultViewState
+        }
+    }
+
+    fun refresh() {
+        if (_genreViewStateFlow.value is ResultViewState.Success
+            || _genreViewStateFlow.value is ResultViewState.Error) {
+            fetchGenres()
         }
     }
 

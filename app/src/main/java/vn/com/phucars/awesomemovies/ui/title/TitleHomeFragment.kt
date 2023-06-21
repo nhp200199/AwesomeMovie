@@ -5,12 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -27,7 +27,7 @@ import vn.com.phucars.awesomemovies.ui.genre.GenreViewState
 
 @AndroidEntryPoint
 class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
-    private val viewModel: MainActivityViewModel by viewModels()
+    private val viewModel: HomeTitleViewModel by viewModels()
     private lateinit var genreAdapter: BaseRecyclerAdapter<GenreViewState, ItemGenreBinding>
     private lateinit var titlesPagerAdapter: TitlePagerAdapter
 
@@ -75,22 +75,31 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
     }
 
     override fun setViewListener() {
+        binding.swlRefreshHomeTitle.setOnRefreshListener {
+            viewModel.refresh()
+        }
+
         binding.vpTitlePageContainer.registerOnPageChangeCallback(pagerChangeCallback)
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.genreViewStateFlow.collect { it ->
                     Log.d(getClassTag(), "genre view state = $it")
+                    binding.swlRefreshHomeTitle.isRefreshing = false
                     when (it) {
                         is ResultViewState.Initial -> {}
                         is ResultViewState.Loading -> {
                             binding.pbMainGenre.visibility = View.VISIBLE
-                            binding.tilesGenresContainer.visibility = View.GONE
                         }
-                        is ResultViewState.Error -> {}
+                        is ResultViewState.Error -> {
+                            binding.tvLoadDetailError.isVisible = true
+                            binding.pbMainGenre.isVisible = false
+                            binding.titlesGenresContainer.isVisible = false
+                        }
                         is ResultViewState.Success -> {
+                            binding.titlesGenresContainer.visibility = View.VISIBLE
                             binding.pbMainGenre.visibility = View.GONE
-                            binding.tilesGenresContainer.visibility = View.VISIBLE
+                            binding.tvLoadDetailError.isVisible = false
 
                             genreAdapter.update(it.data)
                             titlesPagerAdapter.update(it.data.map { it.genre })

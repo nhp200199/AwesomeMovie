@@ -19,13 +19,13 @@ class MainActivityViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    lateinit var SUT: MainActivityViewModel
+    lateinit var SUT: HomeTitleViewModel
     lateinit var getGenreListUseCase: GetGenreListUseCase
 
     @Before
     fun setup() {
         getGenreListUseCase = mockk<GetGenreListUseCase>()
-        SUT = MainActivityViewModel(getGenreListUseCase)
+        SUT = HomeTitleViewModel(getGenreListUseCase)
     }
 
     //initialize - begin get genre list - emit loading state

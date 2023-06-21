@@ -11,40 +11,57 @@
         android:id="@+id/include_tb"
         layout="@layout/layout_toolbar"/>
 
-    <FrameLayout
-        android:id="@+id/title_home_container"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swl_refresh_home_title"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ProgressBar
-            android:id="@+id/pb_main_genre"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"/>
-
-        <LinearLayout
-            android:id="@+id/tiles_genres_container"
+        <FrameLayout
+            android:id="@+id/title_home_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:paddingHorizontal="8dp">
+            android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rcv_genres"
+
+            <TextView
+                android:id="@+id/tv_load_detail_error"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"/>
+                android:text="Error when loading title detail. Pull down to refresh"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="8dp"/>
 
-            <androidx.viewpager2.widget.ViewPager2
-                android:id="@+id/vp_title_page_container"
+            <LinearLayout
+                android:id="@+id/titles_genres_container"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginVertical="16dp">
-            </androidx.viewpager2.widget.ViewPager2>
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingHorizontal="8dp">
 
-        </LinearLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rcv_genres"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"/>
 
-    </FrameLayout>
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/vp_title_page_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginVertical="16dp">
+                </androidx.viewpager2.widget.ViewPager2>
+
+            </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/pb_main_genre"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center" />
+
+        </FrameLayout>
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </LinearLayout>
