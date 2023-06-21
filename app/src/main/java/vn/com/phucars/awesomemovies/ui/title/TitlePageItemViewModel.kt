@@ -16,7 +16,6 @@ import javax.inject.Inject
 @HiltViewModel
 class TitlePageItemViewModel @Inject constructor(
     private val getTitlesWithRatingByGenre: GetTitlesWithRatingByGenre,
-    private val dispatcherProvider: DispatcherProvider
 ) : ViewModel(){
     private val currentGenre = MutableStateFlow<String>("")
 
