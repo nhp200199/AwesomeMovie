@@ -29,7 +29,8 @@
                 android:text="Error when loading title detail. Pull down to refresh"
                 android:gravity="center_horizontal"
                 android:layout_gravity="center"
-                android:layout_marginHorizontal="8dp"/>
+                android:layout_marginHorizontal="8dp"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:id="@+id/titles_genres_container"
@@ -58,7 +59,8 @@
                 android:id="@+id/pb_main_genre"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_gravity="center" />
+                android:layout_gravity="center"
+                android:visibility="gone"/>
 
         </FrameLayout>
 

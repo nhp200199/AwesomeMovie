@@ -3,7 +3,6 @@ package vn.com.phucars.awesomemovies.ui.title
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -12,16 +11,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.LoadState
-import androidx.paging.LoadStateAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.databinding.FragmentTitlePageItemBinding
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
-import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
 import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailFragment
 
@@ -70,13 +68,19 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
             }
         }
         binding.rcvTitles.adapter = titleAdapter
-            .withLoadStateFooter(TitleLoadStateAdapter())
+            .withLoadStateFooter(TitleLoadStateAdapter() {
+                titleAdapter.retry()
+            })
         binding.rcvTitles.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         binding.rcvTitles.addItemDecoration(MarginItemDecoration(bottom = resources.getDimension(R.dimen.default_margin_vertical_list_item).toInt()))
     }
 
     override fun setViewListener() {
+        binding.btnRetry.setOnClickListener {
+            titleAdapter.retry()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.titleWithRatingFlow.collectLatest {
@@ -88,9 +92,13 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                titleAdapter.loadStateFlow.collectLatest {
+                titleAdapter.loadStateFlow
+                    .distinctUntilChangedBy { it.refresh }
+                    .collectLatest {
+                        Log.d(getClassTag(), "current load state: $it")
                     binding.pbTitle.isVisible = it.refresh is LoadState.Loading
                     binding.rcvTitles.isVisible = it.refresh !is LoadState.Loading
+                    binding.llRetryContainer.isVisible = it.refresh is LoadState.Error
                 }
             }
         }
