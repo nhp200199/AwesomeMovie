@@ -6,6 +6,7 @@
     android:background="@drawable/round_bg_state_list"
     android:singleLine="true"
     android:ellipsize="end"
-    android:gravity="center">
+    android:gravity="center"
+    android:textAppearance="?attr/textAppearanceBody2">
 
 </TextView>

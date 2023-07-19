@@ -49,7 +49,9 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     override fun setupView() {
         binding.includeTb.toolbar.apply {
             title = this@TitleDetailFragment.titleName
-            navigationIcon = resources.getDrawable(com.google.android.material.R.drawable.ic_arrow_back_black_24)
+            navigationIcon = resources.getDrawable(com.google.android.material.R.drawable.ic_arrow_back_black_24).also {
+                it.setTint(resources.getColor(R.color.white))
+            }
             setNavigationOnClickListener {
                 requireActivity().onBackPressed()
             }
@@ -112,7 +114,7 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
             .constantState!!
             .newDrawable(resources)
             .mutate()
-        drawable.overrideColor(resources.getColor(R.color.teal_700))
+        drawable.overrideColor(resources.getColor(R.color.teal_400))
         tvGenre.background = drawable
 
         return tvGenre

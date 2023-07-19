@@ -25,19 +25,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:ellipsize="end"/>
+            android:ellipsize="end"
+            android:textAppearance="?attr/textAppearanceBody2"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="as"/>
+            android:text="as"
+            android:textAppearance="?attr/textAppearanceBody2"/>
 
         <TextView
             android:id="@+id/tv_character"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
-            android:ellipsize="end"/>
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:textAppearance="?attr/textAppearanceBody2"/>
 
 
     </LinearLayout>

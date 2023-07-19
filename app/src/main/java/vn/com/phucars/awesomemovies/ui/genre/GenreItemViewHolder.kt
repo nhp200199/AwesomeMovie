@@ -19,7 +19,7 @@ class GenreItemViewHolder(itemView: View) : BaseRecyclerViewHolder<ItemGenreBind
             binding.tvGenre.text = data.genre
 
             if (data.selected) {
-                binding.tvGenre.setTextColor(context.resources.getColor(R.color.teal_700))
+                binding.tvGenre.setTextColor(context.resources.getColor(R.color.teal_400))
                 binding.tvGenre.background = context.getDrawable(R.drawable.round_white_bg)
             } else {
                 binding.tvGenre.setTextColor(context.resources.getColor(R.color.white))

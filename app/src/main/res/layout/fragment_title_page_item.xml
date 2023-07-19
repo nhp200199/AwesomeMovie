@@ -23,11 +23,8 @@
 
         <TextView
             android:id="@+id/tv_load_detail_error"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Error when loading titles."
-            android:gravity="center_horizontal"
-            android:layout_marginHorizontal="8dp"/>
+            style="@style/LoadingErrorText"
+            android:text="Error when loading titles." />
 
         <Button
             android:id="@+id/btn_retry"
