@@ -1,7 +1,8 @@
-package vn.com.phucars.awesomemovies.domain.title
+package vn.com.phucars.awesomemovies.domain.title.mapper
 
 import vn.com.phucars.awesomemovies.data.title.DetailTitleRemoteData
 import vn.com.phucars.awesomemovies.data.title.TitleData
+import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.Mapper
 
 class NewTitleWithRatingRemoteDtoToDomain : Mapper<DetailTitleRemoteData, TitleWithRatingDomain> {

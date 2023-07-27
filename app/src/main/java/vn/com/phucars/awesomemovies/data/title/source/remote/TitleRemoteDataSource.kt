@@ -19,4 +19,6 @@ interface TitleRemoteDataSource {
     suspend fun getGenres(): ResultData<BaseNetworkData<List<String?>>>
 
     suspend fun getTitleDetailById(id: String, info: String = ParamInfo.MINI_INFO): ResultData<BaseNetworkData<DetailTitleRemoteData>>
+
+    suspend fun searchForTitle(searchString: String): ResultData<BaseNetworkPagingData<List<DetailTitleRemoteData>>>
 }

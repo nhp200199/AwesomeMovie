@@ -6,9 +6,9 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import vn.com.phucars.awesomemovies.data.title.DetailTitleRemoteData
 import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
-import vn.com.phucars.awesomemovies.domain.title.NewTitleWithRatingRemoteDtoToDomain
+import vn.com.phucars.awesomemovies.domain.title.mapper.NewTitleWithRatingRemoteDtoToDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
-import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingRemoteDtoToDomain
+import vn.com.phucars.awesomemovies.domain.title.mapper.TitleWithRatingRemoteDtoToDomain
 import vn.com.phucars.awesomemovies.mapper.Mapper
 
 @Module

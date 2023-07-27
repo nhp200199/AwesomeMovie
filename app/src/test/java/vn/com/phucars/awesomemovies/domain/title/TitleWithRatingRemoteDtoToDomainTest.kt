@@ -7,6 +7,7 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
+import vn.com.phucars.awesomemovies.domain.title.mapper.TitleWithRatingRemoteDtoToDomain
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
 

@@ -33,6 +33,15 @@ class TitleRemoteDataSourceImpl @Inject constructor(private val titleService: Ti
             NetworkResponse.UnknownError -> ResultData.Error(UnknownException())
         }
 
+    override suspend fun searchForTitle(searchString: String): ResultData<BaseNetworkPagingData<List<DetailTitleRemoteData>>> {
+        return when (val searchTitlelResult = titleService.searchForTitle(searchString)) {
+            is NetworkResponse.ApiError -> ResultData.Error(UnknownException())
+            is NetworkResponse.NetworkError -> ResultData.Error(UnknownException())
+            is NetworkResponse.Success -> ResultData.Success(searchTitlelResult.body)
+            NetworkResponse.UnknownError -> ResultData.Error(UnknownException())
+        }
+    }
+
 
     override suspend fun getTitleById(id: String): ResultData<BaseNetworkData<TitleData>> =
         when (val titleData = titleService.getTitleById(id)) {

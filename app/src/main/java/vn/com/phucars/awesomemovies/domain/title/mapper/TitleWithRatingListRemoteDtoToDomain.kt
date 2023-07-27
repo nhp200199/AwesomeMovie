@@ -1,7 +1,8 @@
-package vn.com.phucars.awesomemovies.domain.title
+package vn.com.phucars.awesomemovies.domain.title.mapper
 
 import vn.com.phucars.awesomemovies.mapper.Mapper
 import vn.com.phucars.awesomemovies.data.title.TitleWithRatingRemoteData
+import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
 import vn.com.phucars.awesomemovies.mapper.ListMapper
 
 class TitleWithRatingListRemoteDtoToDomain(private val mapper: Mapper<TitleWithRatingRemoteData, TitleWithRatingDomain>): ListMapper<TitleWithRatingRemoteData, TitleWithRatingDomain> {
