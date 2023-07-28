@@ -74,6 +74,18 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun searchForString(searchString: String): ResultDomain<List<TitleWithRatingDomain>> {
+        val searchForTitle = titleRemoteDataSource.searchForTitle(searchString)
+        return when(searchForTitle) {
+            is ResultData.Error -> ResultDomain.Error(Exception())
+            is ResultData.Success -> ResultDomain.Success(
+                searchForTitle.data.results.map {
+                    detailTitleRemoteDataDtoToDomain.map(it)
+                }
+            )
+        }
+    }
+
     private suspend fun getTitleRating(titleId: String): ResultData<TitleData.Rating> {
         val titleRating = titleRemoteDataSource.getTitleRating(titleId)
         return when (titleRating) {

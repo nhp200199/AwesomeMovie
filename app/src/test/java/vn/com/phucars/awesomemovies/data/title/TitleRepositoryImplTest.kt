@@ -72,6 +72,44 @@ class TitleRepositoryImplTest {
     }
 
     @Test
+    fun searchForTitle_correctSearchStringPassed() = runTest {
+        successSearchForTitle()
+        mapNewTitleRemoteDataDtoToDomain()
+
+        val slot = slot<String>()
+        SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
+
+        coVerify {
+            titleRemoteDataSource.searchForTitle(capture(slot))
+        }
+
+        assertThat(TitleDataTest.TITLE_SEARCH_STRING, `is`(slot.captured))
+    }
+
+    @Test
+    fun searchForTitle_success_successValueReturned() = runTest {
+        successSearchForTitle()
+        mapNewTitleRemoteDataDtoToDomain()
+
+        val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
+
+        assertThat(searchForString, `is`(instanceOf(ResultDomain.Success::class.java)))
+    }
+
+    @Test
+    fun searchForTitle_error_generalErrorReturned() = runTest {
+        coEvery {
+            titleRemoteDataSource.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
+        }.returns(
+            ResultData.Error(Exception())
+        )
+        
+        val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
+
+        assertThat(searchForString, `is`(instanceOf(ResultDomain.Error::class.java)))
+    }
+
+    @Test
     fun getDetailTitleById_correctIdAndCustomInfoPassed() = runTest {
         val idSlot = slot<String>()
         val infoSlot = slot<String>()
@@ -424,6 +462,20 @@ class TitleRepositoryImplTest {
 
 
     //helper methods
+    private fun successSearchForTitle() {
+        coEvery {
+            titleRemoteDataSource.searchForTitle("Fast & Furious")
+        }.returns(
+            ResultData.Success(
+                BaseNetworkPagingData(
+                    listOf(TitleDataTest.DETAIL_TITLE_100_YEARS_DATA),
+                    "",
+                    ""
+                )
+            )
+        )
+    }
+
     private fun mapNewTitleRemoteDataDtoToDomain() {
         every { detailTitleRemoteDtoToDomain.map(TitleDataTest.DETAIL_TITLE_100_YEARS_DATA) }
             .returns(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN)

@@ -9,6 +9,8 @@ import vn.com.phucars.awesomemovies.testdata.RatingDataTest.Companion.UPDATE_TIT
 
 class TitleDataTest {
     companion object {
+        val TITLE_SEARCH_STRING = "Fast & Furious"
+        
         val TITLE_100_YEARS_ID = "tt0001922"
         val TITLE_CUONG_ID = "tt0001923"
         val TITLE_DUNG_ID = "tt0001924"

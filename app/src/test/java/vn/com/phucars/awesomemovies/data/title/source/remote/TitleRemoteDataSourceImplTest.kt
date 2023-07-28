@@ -18,7 +18,6 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class TitleRemoteDataSourceImplTest {
-    private val SEARCH_STRING = "Fast & Furious"
     lateinit var SUT: TitleRemoteDataSourceImpl
     lateinit var titleService: TitleService
 
@@ -35,12 +34,12 @@ class TitleRemoteDataSourceImplTest {
         success()
 
         val slot = slot<String>()
-        SUT.searchForTitle(SEARCH_STRING)
+        SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         coVerify() {
             titleService.searchForTitle(capture(slot))
         }
-        assertThat(slot.captured, `is`(SEARCH_STRING))
+        assertThat(slot.captured, `is`(TitleDataTest.TITLE_SEARCH_STRING))
     }
 
     //searchTitle -> success -> return success value
@@ -48,7 +47,7 @@ class TitleRemoteDataSourceImplTest {
     fun searchForTitle_success_successValueReturned() = runTest {
         success()
 
-        val searchForTitle = SUT.searchForTitle(SEARCH_STRING)
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForTitle, `is`(instanceOf(ResultData.Success::class.java)))
     }
@@ -57,7 +56,7 @@ class TitleRemoteDataSourceImplTest {
     fun searchForTitle_networkError_networkErrorReturned() = runTest {
         networkError()
 
-        val searchForTitle = SUT.searchForTitle(SEARCH_STRING)
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForTitle, `is`(instanceOf(ResultData.Error::class.java)))
     }
@@ -66,7 +65,7 @@ class TitleRemoteDataSourceImplTest {
     fun searchForTitle_apiError_apiErrorReturned() = runTest {
         apiError()
 
-        val searchForTitle = SUT.searchForTitle(SEARCH_STRING)
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForTitle, `is`(instanceOf(ResultData.Error::class.java)))
     }
@@ -76,14 +75,14 @@ class TitleRemoteDataSourceImplTest {
     fun searchForTitle_unknownError_unknownErrorReturned() = runTest {
         unknownError()
 
-        val searchForTitle = SUT.searchForTitle(SEARCH_STRING)
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForTitle, `is`(instanceOf(ResultData.Error::class.java)))
     }
 
     private fun success() {
         coEvery {
-            titleService.searchForTitle(SEARCH_STRING)
+            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
         }.returns(
             NetworkResponse.Success(
                 BaseNetworkPagingData(
@@ -97,7 +96,7 @@ class TitleRemoteDataSourceImplTest {
 
     private fun networkError() {
         coEvery {
-            titleService.searchForTitle(SEARCH_STRING)
+            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
         }.returns(
             NetworkResponse.NetworkError(IOException())
         )
@@ -105,7 +104,7 @@ class TitleRemoteDataSourceImplTest {
 
     private fun apiError() {
         coEvery {
-            titleService.searchForTitle(SEARCH_STRING)
+            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
         }.returns(
             NetworkResponse.ApiError()
         )
@@ -113,7 +112,7 @@ class TitleRemoteDataSourceImplTest {
 
     private fun unknownError() {
         coEvery {
-            titleService.searchForTitle(SEARCH_STRING)
+            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
         }.returns(
             NetworkResponse.UnknownError
         )
