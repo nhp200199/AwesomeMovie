@@ -1,10 +1,10 @@
 package vn.com.phucars.awesomemovies.ui.title
 
+import android.os.Bundle
 import android.util.Log
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -24,6 +24,7 @@ import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
 import vn.com.phucars.awesomemovies.ui.genre.GenreViewState
+import vn.com.phucars.awesomemovies.ui.titleSearch.TitleSearchFragment
 
 @AndroidEntryPoint
 class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
@@ -52,6 +53,7 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
         setUpGenreAdapter()
         setUpTitlePageAdapter()
 
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.includeTb.toolbar)
         binding.includeTb.toolbar.title = resources.getString(R.string.app_name)
     }
 
@@ -112,9 +114,31 @@ class TitleHomeFragment : BaseFragment<FragmentTitleHomeBinding>() {
         }
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        super.onCreate(savedInstanceState)
+    }
+
     override fun onDestroyView() {
         binding.vpTitlePageContainer.unregisterOnPageChangeCallback(pagerChangeCallback)
         super.onDestroyView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_search_title, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_search_title -> {
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.main_container, TitleSearchFragment.newInstance())
+                    .addToBackStack(null)
+                    .commit()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private inner class TitlePagerAdapter(

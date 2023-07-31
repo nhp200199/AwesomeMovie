@@ -16,7 +16,7 @@ class NewTitleWithRatingRemoteDtoToDomain : Mapper<DetailTitleRemoteData, TitleW
             input.ratingsSummary?.numVotes ?: TitleData.Rating.DEFAULT_VALUE.numVotes,
             input.plot?.plotText?.plainText,
             input.plot?.trailer,
-            input.genres.genres.map { it.text },
+            input.genres?.genres?.map { it.text },
             input.principalCast
         )
     }
