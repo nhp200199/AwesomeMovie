@@ -14,4 +14,6 @@ interface TitleRepository {
 
     suspend fun getTitleDetailById(id: String, info: String? = null): ResultDomain<TitleWithRatingDomain>
     suspend fun searchForString(searchString: String): ResultDomain<List<TitleWithRatingDomain>>
+
+    suspend fun getTitleWithRatingPagingListBySearch(searchString: String): Flow<PagingData<TitleWithRatingDomain>>
 }

@@ -20,5 +20,5 @@ interface TitleRemoteDataSource {
 
     suspend fun getTitleDetailById(id: String, info: String = ParamInfo.MINI_INFO): ResultData<BaseNetworkData<DetailTitleRemoteData>>
 
-    suspend fun searchForTitle(searchString: String): ResultData<BaseNetworkPagingData<List<DetailTitleRemoteData>>>
+    suspend fun searchForTitle(searchString: String, page: Int = 1): ResultData<BaseNetworkPagingData<List<DetailTitleRemoteData>>>
 }

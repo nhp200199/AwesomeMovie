@@ -3,29 +3,28 @@ package vn.com.phucars.awesomemovies.ui.titleSearch
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.core.view.isVisible
+import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.R
 import vn.com.phucars.awesomemovies.databinding.FragmentTitleSearchBinding
-import vn.com.phucars.awesomemovies.databinding.ItemTitleBinding
-import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
-import vn.com.phucars.awesomemovies.ui.base.adapter.BaseRecyclerAdapter
 import vn.com.phucars.awesomemovies.ui.common.MarginItemDecoration
-import vn.com.phucars.awesomemovies.ui.title.TitleItemViewHolder
-import vn.com.phucars.awesomemovies.ui.title.TitleWithRatingViewState
+import vn.com.phucars.awesomemovies.ui.title.DetailTitlePagingAdapter
 import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailFragment
 import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailViewState
 
@@ -33,7 +32,7 @@ import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailViewState
 class TitleSearchFragment : BaseFragment<FragmentTitleSearchBinding>() {
     private val viewModel: TitleSearchViewModel by viewModels()
 
-    private val adapter = BaseRecyclerAdapter<TitleWithRatingViewState, ItemTitleBinding>()
+    private lateinit var adapter: DetailTitlePagingAdapter
 
     override fun getClassTag(): String {
         return TitleSearchFragment::class.java.simpleName
@@ -54,6 +53,29 @@ class TitleSearchFragment : BaseFragment<FragmentTitleSearchBinding>() {
     }
 
     private fun setupRecyclerView() {
+        adapter = DetailTitlePagingAdapter(object :
+            DiffUtil.ItemCallback<TitleDetailViewState>() {
+            override fun areItemsTheSame(
+                oldItem: TitleDetailViewState,
+                newItem: TitleDetailViewState
+            ): Boolean {
+                return oldItem.areItemsTheSame(newItem)
+            }
+
+            override fun areContentsTheSame(
+                oldItem: TitleDetailViewState,
+                newItem: TitleDetailViewState
+            ): Boolean {
+                return oldItem.areContentsTheSame(newItem)
+            }
+
+        }) { item ->
+            requireActivity().supportFragmentManager.commit {
+                replace(R.id.main_container, TitleDetailFragment.newInstance(item.id, item.title))
+                setReorderingAllowed(true)
+                addToBackStack(null)
+            }
+        }
 
         binding.rcvTitlesResult.apply {
             this.adapter = this@TitleSearchFragment.adapter
@@ -88,31 +110,23 @@ class TitleSearchFragment : BaseFragment<FragmentTitleSearchBinding>() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.titleSearchResultFlow.collect {
+                viewModel.titleSearchResultFlow.collectLatest {
                     Log.d(getClassTag(), it.toString())
-                    when (it) {
-                        is ResultViewState.Error -> {
-                            binding.tvLoadDetailError.isVisible = true
-                            binding.pbTitleDetail.isVisible = false
-                            binding.rcvTitlesResult.isVisible = false
-
-                        }
-                        ResultViewState.Initial -> {}
-                        ResultViewState.Loading -> {
-                            binding.pbTitleDetail.isVisible = true
-                            binding.tvLoadDetailError.isVisible = false
-                            binding.rcvTitlesResult.isVisible = false
-                        }
-                        is ResultViewState.Success -> {
-                            adapter.update(it.data)
-
-                            binding.rcvTitlesResult.isVisible = true
-                            binding.pbTitleDetail.isVisible = false
-                            binding.tvLoadDetailError.isVisible = false
-
-                        }
-                    }
+                    adapter.submitData(it)
                 }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                adapter.loadStateFlow
+                    .distinctUntilChangedBy { it.refresh }
+                    .collectLatest {
+                        Log.d(getClassTag(), "current load state: $it")
+                        binding.pbTitleSearch.isVisible = it.refresh is LoadState.Loading
+                        binding.rcvTitlesResult.isVisible = it.refresh !is LoadState.Loading
+                        binding.tvLoadDetailError.isVisible = it.refresh is LoadState.Error
+                    }
             }
         }
     }

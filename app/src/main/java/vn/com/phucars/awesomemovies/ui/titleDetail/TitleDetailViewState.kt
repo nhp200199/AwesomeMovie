@@ -14,7 +14,18 @@ data class TitleDetailViewState(
     val rating: Double,
     val voteCount: Int,
     val duration: String,
-) {
+) : RecyclerViewData {
+    override fun getViewType(): Int {
+        return R.layout.item_title
+    }
+
+    override fun areItemsTheSame(other: RecyclerViewData): Boolean {
+        return this.id == (other as TitleDetailViewState).id
+    }
+
+    override fun areContentsTheSame(other: RecyclerViewData): Boolean {
+        return areItemsTheSame(other)
+    }
 }
 
 data class Actor(

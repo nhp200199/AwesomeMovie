@@ -2,33 +2,32 @@ package vn.com.phucars.awesomemovies.ui.titleSearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
+import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.SearchTitleUseCase
 import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.title.TitleWithRatingViewState
-import vn.com.phucars.awesomemovies.ui.titleDetail.TitleDetailViewState
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TitleSearchViewModel @Inject constructor(private val searchTitleUseCase: SearchTitleUseCase) : ViewModel() {
-    private val _titleSearchResultFlow = MutableStateFlow<ResultViewState<List<TitleWithRatingViewState>>>(ResultViewState.Initial)
-    val titleSearchResultFlow = _titleSearchResultFlow.asStateFlow()
+    private val _titleSearchFlow = MutableStateFlow<String>("")
 
-    fun searchForTitle(searchString: String) {
-        _titleSearchResultFlow.value = ResultViewState.Loading
-
-        viewModelScope.launch {
-            val searchTitleResult = searchTitleUseCase(searchString)
-            when(searchTitleResult) {
-                is ResultDomain.Error -> _titleSearchResultFlow.value = ResultViewState.Error(searchTitleResult.exception)
-                is ResultDomain.Success -> _titleSearchResultFlow.value = ResultViewState.Success(searchTitleResult.data.map {
-                    it.toViewState()
-                })
+    val titleSearchResultFlow = _titleSearchFlow.filter { it.isNotEmpty() }.flatMapLatest {
+        searchTitleUseCase(it).map { pagingData ->
+            pagingData.map {
+                it.toDetailViewState()
             }
         }
+    }.cachedIn(viewModelScope)
+
+    fun searchForTitle(searchString: String) {
+        _titleSearchFlow.value = searchString
     }
 }

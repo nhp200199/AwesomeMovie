@@ -30,5 +30,5 @@ interface TitleService {
             NetworkResponse<BaseNetworkData<DetailTitleRemoteData>>
 
     @GET("/titles/search/title/{searchString}?titleType=movie&exact=false")
-    suspend fun searchForTitle(@Path("searchString") searchString: String): NetworkResponse<BaseNetworkPagingData<List<DetailTitleRemoteData>>>
+    suspend fun searchForTitle(@Path("searchString") searchString: String, @Query("page") page: Int): NetworkResponse<BaseNetworkPagingData<List<DetailTitleRemoteData>>>
 }

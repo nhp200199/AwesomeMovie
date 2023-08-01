@@ -8,8 +8,9 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleByGenrePagingDataSource
+import vn.com.phucars.awesomemovies.data.title.source.remote.TitleBySearchPagingDataSource
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
-import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemotePagingDataSource
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
@@ -83,6 +84,21 @@ class TitleRepositoryImpl @Inject constructor(
                     detailTitleRemoteDataDtoToDomain.map(it)
                 }
             )
+        }
+    }
+
+    override suspend fun getTitleWithRatingPagingListBySearch(searchString: String): Flow<PagingData<TitleWithRatingDomain>> {
+        return Pager(
+            PagingConfig(10, enablePlaceholders = false)
+        ) {
+            TitleBySearchPagingDataSource(
+                titleRemoteDataSource,
+                searchString
+            )
+        }.flow.map {
+            it.map {
+                detailTitleRemoteDataDtoToDomain.map(it)
+            }
         }
     }
 
@@ -186,7 +202,7 @@ class TitleRepositoryImpl @Inject constructor(
         return Pager(
             PagingConfig(10, enablePlaceholders = false)
         ) {
-            TitleRemotePagingDataSource(
+            TitleByGenrePagingDataSource(
                 titleRemoteDataSource,
                 genre
             )

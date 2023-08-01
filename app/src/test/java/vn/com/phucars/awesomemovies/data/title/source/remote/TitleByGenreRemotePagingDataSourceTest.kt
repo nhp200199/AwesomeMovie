@@ -24,13 +24,13 @@ import java.lang.Exception
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
-class TitleRemotePagingDataSourceTest {
-    lateinit var SUT: TitleRemotePagingDataSource
+class TitleByGenreRemotePagingDataSourceTest {
+    lateinit var SUT: TitleByGenrePagingDataSource
     val titleRemoteDataSource = mockk<TitleRemoteDataSource>()
 
     @Before
     fun setup() {
-        SUT = TitleRemotePagingDataSource(titleRemoteDataSource, GenreDataTest.GENRE_ACTION)
+        SUT = TitleByGenrePagingDataSource(titleRemoteDataSource, GenreDataTest.GENRE_ACTION)
 
     }
 
@@ -97,7 +97,7 @@ class TitleRemotePagingDataSourceTest {
 
     @Test
     fun getTitlesPaging_endLoad_pageReturnedWithNullNextKey() = runTest {
-        val pageToLoad = TitleRemotePagingDataSource.MAX_PAGE
+        val pageToLoad = BaseRemotePagingDataSource.MAX_PAGE
 
         coEvery { titleRemoteDataSource.getTitleListByGenre(GenreDataTest.GENRE_ACTION, pageToLoad) }
             .returns(ResultData.Success(BaseNetworkPagingData(
@@ -127,13 +127,13 @@ class TitleRemotePagingDataSourceTest {
 
     @Test
     fun getTitlePaging_errorGettingTitles_pageWithErrorReturned() = runTest {
-        coEvery { titleRemoteDataSource.getTitleListByGenre(GenreDataTest.GENRE_ACTION, TitleRemotePagingDataSource.MAX_PAGE) }
+        coEvery { titleRemoteDataSource.getTitleListByGenre(GenreDataTest.GENRE_ACTION, BaseRemotePagingDataSource.MAX_PAGE) }
             .returns(ResultData.Error(Exception()))
 
         assertThat(
             SUT.load(
                 PagingSource.LoadParams.Append(
-                    key = TitleRemotePagingDataSource.MAX_PAGE,
+                    key = BaseRemotePagingDataSource.MAX_PAGE,
                     loadSize = 1,
                     placeholdersEnabled = false
                 )
