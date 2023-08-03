@@ -14,11 +14,9 @@ import org.mockito.junit.MockitoJUnitRunner
 
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
-import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.testdata.GenreDataTest
-import vn.com.phucars.awesomemovies.testdata.RatingDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 import java.lang.Exception
 
@@ -44,13 +42,11 @@ class TitleByGenreRemotePagingDataSourceTest {
                 pageToLoad.toString(),
                 pageToLoad.inc().toString()
             )))
-        coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_100_YEARS_ID) }
-            .returns(ResultData.Success(BaseNetworkData(RatingDataTest.TITLE_100_YEARS_RATING)))
 
         assertThat(
             PagingSource.LoadResult.Page(
                 listOf(
-                    TitleDataTest.TITLE_100_YEARS_WITH_RATING_REMOTE_DATA
+                    TitleDataTest.TITLE_100_YEARS_DATA
                 ), null, pageToLoad + 1
             ), `is`(
                 SUT.load(
@@ -62,7 +58,6 @@ class TitleByGenreRemotePagingDataSourceTest {
                 )
             )
         )
-
     }
 
     @Test
@@ -75,13 +70,11 @@ class TitleByGenreRemotePagingDataSourceTest {
                 pageToLoad.toString(),
                 pageToLoad.inc().toString()
             )))
-        coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_100_YEARS_ID) }
-            .returns(ResultData.Success(BaseNetworkData(RatingDataTest.TITLE_100_YEARS_RATING)))
 
         assertThat(
             PagingSource.LoadResult.Page(
                 listOf(
-                    TitleDataTest.TITLE_100_YEARS_WITH_RATING_REMOTE_DATA
+                    TitleDataTest.TITLE_100_YEARS_DATA
                 ), pageToLoad.dec(), pageToLoad.inc()
             ), `is`(
                 SUT.load(
@@ -105,13 +98,11 @@ class TitleByGenreRemotePagingDataSourceTest {
                 pageToLoad.toString(),
                 "null"
             )))
-        coEvery { titleRemoteDataSource.getTitleRating(TitleDataTest.TITLE_100_YEARS_ID) }
-            .returns(ResultData.Success(BaseNetworkData(RatingDataTest.TITLE_100_YEARS_RATING)))
 
         assertThat(
             PagingSource.LoadResult.Page(
                 listOf(
-                    TitleDataTest.TITLE_100_YEARS_WITH_RATING_REMOTE_DATA
+                    TitleDataTest.TITLE_100_YEARS_DATA
                 ), pageToLoad - 1, null
             ), `is`(
                 SUT.load(

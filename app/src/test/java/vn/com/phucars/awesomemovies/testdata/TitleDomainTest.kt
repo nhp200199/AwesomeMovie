@@ -1,102 +1,70 @@
 package vn.com.phucars.awesomemovies.testdata
 
-import vn.com.phucars.awesomemovies.data.title.TitleData
-import vn.com.phucars.awesomemovies.domain.title.TitleWithRatingDomain
+import vn.com.phucars.awesomemovies.data.title.Rating
+import vn.com.phucars.awesomemovies.domain.title.TitleDomain
 
 class TitleDomainTest {
     companion object {
 
-        val TITLE_100_YEARS_WITH_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_100_YEARS_ID,
+        val TITLE_100_YEARS_DOMAIN = TitleDomain(
+            TitleDataTest.TITLE_100_YEARS_DATA.id,
             TitleDataTest.TITLE_100_YEARS_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_100_YEARS_DATA.titleText.text,
-            "${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.day}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.month}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.year}",
-            RatingDataTest.TITLE_100_YEARS_RATING.averageRating,
-            RatingDataTest.TITLE_100_YEARS_RATING.numVotes
+            TitleDataTest.TITLE_100_YEARS_DATA.titleText!!.text,
+            "${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate!!.day}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate!!.month}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate!!.year}",
+            TitleDataTest.TITLE_100_YEARS_DATA.ratingsSummary!!.aggregateRating,
+            TitleDataTest.TITLE_100_YEARS_DATA.ratingsSummary!!.voteCount,
+            TitleDataTest.TITLE_100_YEARS_DATA.plot!!.plotText!!.plainText!!,
+            TitleDataTest.TITLE_100_YEARS_DATA.plot!!.trailer!!,
+            TitleDataTest.TITLE_100_YEARS_DATA.genres!!.genres!!.map { it.text!! },
+            TitleDataTest.TITLE_100_YEARS_DATA.principalCast!!,
+            TitleDataTest.TITLE_100_YEARS_DATA.runtime!!.seconds!!
         )
 
-        val TITLE_CUONG_WITH_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_CUONG_ID,
+        val TITLE_CUONG_DOMAIN = TitleDomain(
+            TitleDataTest.TITLE_CUONG_DATA.id,
             TitleDataTest.TITLE_CUONG_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_CUONG_DATA.titleText.text,
-            "${TitleDataTest.TITLE_CUONG_DATA.releaseDate.day}-${TitleDataTest.TITLE_CUONG_DATA.releaseDate.month}-${TitleDataTest.TITLE_CUONG_DATA.releaseDate.year}",
-            RatingDataTest.TITLE_CUONG_RATING.averageRating,
-            RatingDataTest.TITLE_CUONG_RATING.numVotes
+            TitleDataTest.TITLE_CUONG_DATA.titleText!!.text,
+            "${TitleDataTest.TITLE_CUONG_DATA.releaseDate!!.day}-${TitleDataTest.TITLE_CUONG_DATA.releaseDate!!.month}-${TitleDataTest.TITLE_CUONG_DATA.releaseDate!!.year}",
+            TitleDataTest.TITLE_CUONG_DATA.ratingsSummary!!.aggregateRating,
+            TitleDataTest.TITLE_CUONG_DATA.ratingsSummary!!.voteCount,
+            TitleDataTest.TITLE_CUONG_DATA.plot!!.plotText!!.plainText!!,
+            TitleDataTest.TITLE_CUONG_DATA.plot!!.trailer!!,
+            TitleDataTest.TITLE_CUONG_DATA.genres!!.genres!!.map { it.text!! },
+            TitleDataTest.TITLE_CUONG_DATA.principalCast!!,
+            TitleDataTest.TITLE_CUONG_DATA.runtime!!.seconds!!
         )
 
-        val TITLE_DUNG_WITH_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_DUNG_ID,
+        val TITLE_DUNG_DOMAIN = TitleDomain(
+            TitleDataTest.TITLE_DUNG_DATA.id,
             TitleDataTest.TITLE_DUNG_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_DUNG_DATA.titleText.text,
-            "${TitleDataTest.TITLE_DUNG_DATA.releaseDate.day}-${TitleDataTest.TITLE_DUNG_DATA.releaseDate.month}-${TitleDataTest.TITLE_DUNG_DATA.releaseDate.year}",
-            RatingDataTest.TITLE_DUNG_RATING.averageRating,
-            RatingDataTest.TITLE_DUNG_RATING.numVotes
+            TitleDataTest.TITLE_DUNG_DATA.titleText!!.text,
+            "${TitleDataTest.TITLE_DUNG_DATA.releaseDate!!.day}-${TitleDataTest.TITLE_DUNG_DATA.releaseDate!!.month}-${TitleDataTest.TITLE_DUNG_DATA.releaseDate!!.year}",
+            TitleDataTest.TITLE_DUNG_DATA.ratingsSummary!!.aggregateRating,
+            TitleDataTest.TITLE_DUNG_DATA.ratingsSummary!!.voteCount,
+            TitleDataTest.TITLE_DUNG_DATA.plot!!.plotText!!.plainText!!,
+            TitleDataTest.TITLE_DUNG_DATA.plot!!.trailer!!,
+            TitleDataTest.TITLE_DUNG_DATA.genres!!.genres!!.map { it.text!! },
+            TitleDataTest.TITLE_DUNG_DATA.principalCast!!,
+            TitleDataTest.TITLE_DUNG_DATA.runtime!!.seconds!!
         )
 
-        val TITLE_PHUC_WITH_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_PHUC_ID,
+        val TITLE_PHUC_DOMAIN = TitleDomain(
+            TitleDataTest.TITLE_PHUC_DATA.id,
             TitleDataTest.TITLE_PHUC_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_PHUC_DATA.titleText.text,
-            "${TitleDataTest.TITLE_PHUC_DATA.releaseDate.day}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate.month}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate.year}",
-            RatingDataTest.TITLE_PHUC_RATING.averageRating,
-            RatingDataTest.TITLE_PHUC_RATING.numVotes
+            TitleDataTest.TITLE_PHUC_DATA.titleText!!.text,
+            "${TitleDataTest.TITLE_PHUC_DATA.releaseDate!!.day}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate!!.month}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate!!.year}",
+            TitleDataTest.TITLE_PHUC_DATA.ratingsSummary!!.aggregateRating,
+            TitleDataTest.TITLE_PHUC_DATA.ratingsSummary!!.voteCount,
+            TitleDataTest.TITLE_PHUC_DATA.plot!!.plotText!!.plainText!!,
+            TitleDataTest.TITLE_PHUC_DATA.plot!!.trailer!!,
+            TitleDataTest.TITLE_PHUC_DATA.genres!!.genres!!.map { it.text!! },
+            TitleDataTest.TITLE_PHUC_DATA.principalCast!!,
+            TitleDataTest.TITLE_PHUC_DATA.runtime!!.seconds!!
         )
 
-        val TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN = TITLE_100_YEARS_WITH_RATING_DOMAIN.copy(
-            averageRating = TitleData.Rating.DEFAULT_VALUE.averageRating,
-            numVotes = TitleData.Rating.DEFAULT_VALUE.numVotes
-        )
-
-        val DETAIL_TITLE_100_YEARS_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_100_YEARS_ID,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.primaryImage!!.url,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.titleText.text,
-            "${TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.releaseDate!!.day}-${TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.releaseDate!!.month}-${TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.releaseDate!!.year}",
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.ratingsSummary!!.averageRating,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.ratingsSummary!!.numVotes,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.plot!!.plotText.plainText,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.plot!!.trailer,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.genres.genres.map { it.text },
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.principalCast,
-            TitleDataTest.DETAIL_TITLE_100_YEARS_DATA.runtime.seconds
-        )
-
-        val DETAIL_TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN = DETAIL_TITLE_100_YEARS_DOMAIN.copy(
-            averageRating = TitleData.Rating.DEFAULT_VALUE.averageRating,
-            numVotes = TitleData.Rating.DEFAULT_VALUE.numVotes
-        )
-
-        val TITLE_PHUC_WITH_DEFAULT_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_PHUC_ID,
-            TitleDataTest.TITLE_PHUC_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_PHUC_DATA.titleText.text,
-            "${TitleDataTest.TITLE_PHUC_DATA.releaseDate.day}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate.month}-${TitleDataTest.TITLE_PHUC_DATA.releaseDate.year}",
-            TitleData.Rating.DEFAULT_VALUE.averageRating,
-            TitleData.Rating.DEFAULT_VALUE.numVotes,
-        )
-
-
-        val TITLE_WITH_DEFAULT_RATING_LIST_DOMAIN: List<TitleWithRatingDomain> = listOf(
-            TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN,
-            TITLE_CUONG_WITH_RATING_DOMAIN
-        )
-        val TITLE_WITH_RATING_LIST_DOMAIN = listOf(
-            TITLE_100_YEARS_WITH_RATING_DOMAIN,
-            TITLE_CUONG_WITH_RATING_DOMAIN
-        )
-
-        val TITLE_100_YEARS_WITH_UPDATED_RATING_DOMAIN = TitleWithRatingDomain(
-            TitleDataTest.TITLE_100_YEARS_ID,
-            TitleDataTest.TITLE_100_YEARS_DATA.primaryImage!!.url,
-            TitleDataTest.TITLE_100_YEARS_DATA.titleText.text,
-            "${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.day}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.month}-${TitleDataTest.TITLE_100_YEARS_DATA.releaseDate.year}",
-            RatingDataTest.UPDATE_TITLE_100_YEARS_RATING.averageRating,
-            RatingDataTest.UPDATE_TITLE_100_YEARS_RATING.numVotes,
-        )
-
-        val TITLE_WITH_RATING_LIST_GROUP_BY_GENRE = mapOf(
-            Pair(GenreDataTest.GENRE_DRAMA, listOf(TITLE_100_YEARS_WITH_RATING_DOMAIN, TITLE_CUONG_WITH_RATING_DOMAIN)),
-            Pair(GenreDataTest.GENRE_ACTION, listOf(TITLE_DUNG_WITH_RATING_DOMAIN, TITLE_PHUC_WITH_RATING_DOMAIN))
+        val TITLE_100_YEARS_WITH_DEFAULT_RATING_DOMAIN = TITLE_100_YEARS_DOMAIN.copy(
+            averageRating = Rating.DEFAULT_VALUE.aggregateRating,
+            numVotes = Rating.DEFAULT_VALUE.voteCount
         )
     }
 }

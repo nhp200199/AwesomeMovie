@@ -11,7 +11,7 @@ data class TitleDetailViewState(
     val releaseYear: String,
     val description: String,
     val castings: List<Actor>,
-    val rating: Double,
+    val rating: Float,
     val voteCount: Int,
     val duration: String,
 ) : RecyclerViewData {

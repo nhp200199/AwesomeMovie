@@ -38,7 +38,7 @@ class TitleDetailViewModelTest {
     fun init_success_happyPathFlow() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
 
         SUT.titleDetailFlow.test {
             SUT.init(TitleDataTest.TITLE_100_YEARS_ID)
@@ -88,9 +88,9 @@ class TitleDetailViewModelTest {
     fun refresh_currentStateIsSuccess_stateMovesToLoading() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
         SUT.id =TitleDataTest.TITLE_100_YEARS_ID
-        SUT.setTitleDetailState(ResultViewState.Success(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN.toDetailViewState()))
+        SUT.setTitleDetailState(ResultViewState.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN.toDetailViewState()))
 
         SUT.titleDetailFlow.test {
             SUT.refresh()
@@ -105,7 +105,7 @@ class TitleDetailViewModelTest {
     fun refresh_currentStateIsFail_stateMovesToLoading() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.DETAIL_TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
 
         SUT.id =TitleDataTest.TITLE_100_YEARS_ID
         SUT.setTitleDetailState(ResultViewState.Error(Exception()))
