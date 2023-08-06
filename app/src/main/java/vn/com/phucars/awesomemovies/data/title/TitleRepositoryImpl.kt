@@ -12,7 +12,6 @@ import vn.com.phucars.awesomemovies.data.title.source.remote.TitleByGenrePagingD
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleBySearchPagingDataSource
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleDomain
 import vn.com.phucars.awesomemovies.mapper.Mapper
 import javax.inject.Inject
@@ -29,7 +28,7 @@ class TitleRepositoryImpl @Inject constructor(
     override suspend fun getTitleById(
         id: String,
         info: String?
-    ): ResultDomain<TitleDomain> {
+    ): ResultData<TitleDomain> {
         val titleDetailResult = withContext(dispatcherProvider.io()) {
             if (info != null) {
                 titleRemoteDataSource.getTitleDetailById(id, info)
@@ -39,10 +38,10 @@ class TitleRepositoryImpl @Inject constructor(
         }
 
         return when (titleDetailResult) {
-            is ResultData.Error -> ResultDomain.Error(
+            is ResultData.Error -> ResultData.Error(
                 titleDetailResult.exception
             )
-            is ResultData.Success -> ResultDomain.Success(
+            is ResultData.Success -> ResultData.Success(
                 titleDataDtoToDomain.map(
                     titleDetailResult.data.results
                 )
@@ -50,11 +49,11 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchForString(searchString: String): ResultDomain<List<TitleDomain>> {
+    override suspend fun searchForString(searchString: String): ResultData<List<TitleDomain>> {
         val searchForTitle = titleRemoteDataSource.searchForTitle(searchString)
         return when(searchForTitle) {
-            is ResultData.Error -> ResultDomain.Error(Exception())
-            is ResultData.Success -> ResultDomain.Success(
+            is ResultData.Error -> ResultData.Error(Exception())
+            is ResultData.Success -> ResultData.Success(
                 searchForTitle.data.results.map {
                     titleDataDtoToDomain.map(it)
                 }
@@ -77,12 +76,12 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getGenres(): ResultDomain<List<String>> {
+    override suspend fun getGenres(): ResultData<List<String>> {
         val genres = titleRemoteDataSource.getGenres()
         return if (genres is ResultData.Success) {
-            ResultDomain.Success(genres.data.results.filterNotNull())
+            ResultData.Success(genres.data.results.filterNotNull())
         } else {
-            ResultDomain.Error((genres as ResultData.Error).exception)
+            ResultData.Error((genres as ResultData.Error).exception)
         }
     }
 

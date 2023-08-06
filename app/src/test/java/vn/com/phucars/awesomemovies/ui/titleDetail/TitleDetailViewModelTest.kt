@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.*
 import org.mockito.junit.MockitoJUnitRunner
-import vn.com.phucars.awesomemovies.domain.ResultDomain
+import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.domain.title.GetTitleById
 import vn.com.phucars.awesomemovies.testdata.TitleDataTest
 import vn.com.phucars.awesomemovies.testdata.TitleDomainTest
@@ -38,7 +38,7 @@ class TitleDetailViewModelTest {
     fun init_success_happyPathFlow() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultData.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
 
         SUT.titleDetailFlow.test {
             SUT.init(TitleDataTest.TITLE_100_YEARS_ID)
@@ -53,7 +53,7 @@ class TitleDetailViewModelTest {
     fun init_failLoadingDetail_generalErrorFlow() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Error(Exception()))
+        }.returns(ResultData.Error(Exception()))
 
         SUT.titleDetailFlow.test {
             SUT.init(TitleDataTest.TITLE_100_YEARS_ID)
@@ -88,7 +88,7 @@ class TitleDetailViewModelTest {
     fun refresh_currentStateIsSuccess_stateMovesToLoading() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultData.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
         SUT.id =TitleDataTest.TITLE_100_YEARS_ID
         SUT.setTitleDetailState(ResultViewState.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN.toDetailViewState()))
 
@@ -105,7 +105,7 @@ class TitleDetailViewModelTest {
     fun refresh_currentStateIsFail_stateMovesToLoading() = runTest {
         coEvery {
             getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
-        }.returns(ResultDomain.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
+        }.returns(ResultData.Success(TitleDomainTest.TITLE_100_YEARS_DOMAIN))
 
         SUT.id =TitleDataTest.TITLE_100_YEARS_ID
         SUT.setTitleDetailState(ResultViewState.Error(Exception()))

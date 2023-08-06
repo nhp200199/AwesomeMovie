@@ -11,8 +11,8 @@ import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 import org.hamcrest.CoreMatchers.*
 import org.junit.Test
+import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.TitleRepository
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.testdata.GenreDataTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,21 +31,21 @@ class GetGenreListUseCaseTest {
     fun getGenreList_success_genreListReturned() = runTest {
         coEvery {
             repository.getGenres()
-        }.returns(ResultDomain.Success(GenreDataTest.GENRES_LIST.filterNotNull()))
+        }.returns(ResultData.Success(GenreDataTest.GENRES_LIST.filterNotNull()))
 
-        val result: ResultDomain<List<String>> = getGenreListUseCase()
+        val result: ResultData<List<String>> = getGenreListUseCase()
 
-        assertThat(result, `is`(instanceOf(ResultDomain.Success::class.java)))
+        assertThat(result, `is`(instanceOf(ResultData.Success::class.java)))
     }
 
     @Test
     fun getGenreList_generalError_generalErrorReturned() = runTest {
         coEvery {
             repository.getGenres()
-        }.returns(ResultDomain.Error(Exception()))
+        }.returns(ResultData.Error(Exception()))
 
-        val result: ResultDomain<List<String>> = getGenreListUseCase()
+        val result: ResultData<List<String>> = getGenreListUseCase()
 
-        assertThat(result, `is`(instanceOf(ResultDomain.Error::class.java)))
+        assertThat(result, `is`(instanceOf(ResultData.Error::class.java)))
     }
 }

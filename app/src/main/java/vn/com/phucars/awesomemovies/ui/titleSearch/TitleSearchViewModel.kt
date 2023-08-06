@@ -7,11 +7,7 @@ import androidx.paging.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.SearchTitleUseCase
-import vn.com.phucars.awesomemovies.ui.ResultViewState
-import vn.com.phucars.awesomemovies.ui.title.TitleWithRatingViewState
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)

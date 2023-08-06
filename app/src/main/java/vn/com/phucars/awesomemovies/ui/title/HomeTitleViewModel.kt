@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import vn.com.phucars.awesomemovies.domain.ResultDomain
+import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.domain.genre.GetGenreListUseCase
 import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.genre.GenreViewState
@@ -48,8 +48,8 @@ class HomeTitleViewModel @Inject constructor(
         _genreViewStateFlow.value = ResultViewState.Loading
         viewModelScope.launch {
             val resultViewState = when (val genreListResult = getGenreListUseCase()) {
-                is ResultDomain.Error -> ResultViewState.Error(genreListResult.exception)
-                is ResultDomain.Success -> {
+                is ResultData.Error -> ResultViewState.Error(genreListResult.exception)
+                is ResultData.Success -> {
                     genreList = genreListResult.data
                     val genreViewStates = genreListResult.data.map { genre ->
                         GenreViewState(genre, false)

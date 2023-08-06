@@ -6,8 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
-import vn.com.phucars.awesomemovies.domain.ResultDomain
+import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.domain.title.GetTitleById
 import vn.com.phucars.awesomemovies.ui.ResultViewState
 import javax.inject.Inject
@@ -30,8 +29,8 @@ class TitleDetailViewModel @Inject constructor(private val getTitleById: GetTitl
             _titleDetailFlow.value = ResultViewState.Loading
             val resultViewState = when (val resultDomain =
                 getTitleById(id)) {
-                is ResultDomain.Error -> ResultViewState.Error(resultDomain.exception)
-                is ResultDomain.Success -> ResultViewState.Success(
+                is ResultData.Error -> ResultViewState.Error(resultDomain.exception)
+                is ResultData.Success -> ResultViewState.Success(
                     resultDomain.data.toDetailViewState()
                 )
             }

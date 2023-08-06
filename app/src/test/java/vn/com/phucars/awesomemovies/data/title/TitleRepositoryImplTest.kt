@@ -21,7 +21,6 @@ import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
-import vn.com.phucars.awesomemovies.domain.ResultDomain
 import vn.com.phucars.awesomemovies.domain.title.TitleDomain
 import vn.com.phucars.awesomemovies.mapper.ListMapper
 import vn.com.phucars.awesomemovies.mapper.Mapper
@@ -88,7 +87,7 @@ class TitleRepositoryImplTest {
 
         val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
 
-        assertThat(searchForString, `is`(instanceOf(ResultDomain.Success::class.java)))
+        assertThat(searchForString, `is`(instanceOf(ResultData.Success::class.java)))
     }
 
     @Test
@@ -101,7 +100,7 @@ class TitleRepositoryImplTest {
         
         val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
 
-        assertThat(searchForString, `is`(instanceOf(ResultDomain.Error::class.java)))
+        assertThat(searchForString, `is`(instanceOf(ResultData.Error::class.java)))
     }
 
     @Test
@@ -146,7 +145,7 @@ class TitleRepositoryImplTest {
 
         val titleById = SUT.getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
 
-        assertThat(titleById, `is`(instanceOf(ResultDomain.Success::class.java)))
+        assertThat(titleById, `is`(instanceOf(ResultData.Success::class.java)))
     }
 
     @Test
@@ -156,8 +155,8 @@ class TitleRepositoryImplTest {
 
         var titleById = SUT.getTitleById(TitleDataTest.TITLE_100_YEARS_ID)
 
-        assertThat(titleById, `is`(instanceOf(ResultDomain.Success::class.java)))
-        titleById = titleById as ResultDomain.Success
+        assertThat(titleById, `is`(instanceOf(ResultData.Success::class.java)))
+        titleById = titleById as ResultData.Success
         assertThat(titleById.data.averageRating, `is`(Rating.DEFAULT_VALUE.aggregateRating))
         assertThat(titleById.data.numVotes, `is`(Rating.DEFAULT_VALUE.voteCount))
     }
@@ -170,7 +169,7 @@ class TitleRepositoryImplTest {
 
         assertThat(
             titleById,
-            `is`(instanceOf(ResultDomain.Error::class.java))
+            `is`(instanceOf(ResultData.Error::class.java))
         )
     }
 
@@ -185,8 +184,8 @@ class TitleRepositoryImplTest {
 
         var genres = SUT.getGenres()
 
-        assertThat(genres, `is`(instanceOf(ResultDomain.Success::class.java)))
-        genres = genres as ResultDomain.Success
+        assertThat(genres, `is`(instanceOf(ResultData.Success::class.java)))
+        genres = genres as ResultData.Success
         assertThat(genres.data.size, `is`(GenreDataTest.GENRES_LIST.filterNotNull().size))
     }
 
@@ -196,7 +195,7 @@ class TitleRepositoryImplTest {
 
         val data = SUT.getGenres()
 
-        assertThat(data, `is`(instanceOf(ResultDomain.Error::class.java)))
+        assertThat(data, `is`(instanceOf(ResultData.Error::class.java)))
     }
 
     //helper methods
