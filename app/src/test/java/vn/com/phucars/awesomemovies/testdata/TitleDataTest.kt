@@ -40,6 +40,7 @@ class TitleDataTest {
         )
         val TITLE_TEXT = TitleText("100 Years")
         val TITLE_RELEASE_DATE = ReleaseDate(18, 11, 2115)
+        val TITLE_CUONG_RELEASE_DATE = ReleaseDate(18, 11, 2117)
         val TITLE_DURATION = TitleDuration(10)
         val TITLE_PLOT_TEXT = Plot(Plot.PlotText("100 years description"), "100 years trailer url")
 
@@ -66,7 +67,7 @@ class TitleDataTest {
             ),
             TITLE_GENRES,
             TITLE_TEXT,
-            TITLE_RELEASE_DATE,
+            TITLE_CUONG_RELEASE_DATE,
             TITLE_DURATION,
             TITLE_PLOT_TEXT
         )

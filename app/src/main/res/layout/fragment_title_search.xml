@@ -43,6 +43,21 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <Button
+                android:id="@+id/btn_sort_year_incr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Year Increase"
+                android:tag="year.incr"/>
+
+            <Button
+                android:id="@+id/btn_sort_year_decr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Year Decrease"
+                android:tag="year.decr"/>
+
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rcv_titles_result"
                 android:layout_width="match_parent"

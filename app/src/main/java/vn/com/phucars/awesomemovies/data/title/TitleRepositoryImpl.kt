@@ -49,8 +49,8 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun searchForString(searchString: String): ResultData<List<TitleDomain>> {
-        val searchForTitle = titleRemoteDataSource.searchForTitle(searchString)
+    override suspend fun searchForString(searchString: String, sortOptions: Map<String, String?>): ResultData<List<TitleDomain>> {
+        val searchForTitle = titleRemoteDataSource.searchForTitle(searchString, sortOptions = sortOptions)
         return when(searchForTitle) {
             is ResultData.Error -> ResultData.Error(Exception())
             is ResultData.Success -> ResultData.Success(
@@ -61,13 +61,17 @@ class TitleRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getTitlePagingListBySearch(searchString: String): Flow<PagingData<TitleDomain>> {
+    override suspend fun getTitlePagingListBySearch(
+        searchString: String,
+        sortOptions: Map<String, String?>
+    ): Flow<PagingData<TitleDomain>> {
         return Pager(
             PagingConfig(10, enablePlaceholders = false)
         ) {
             TitleBySearchPagingDataSource(
                 titleRemoteDataSource,
-                searchString
+                searchString,
+                sortOptions,
             )
         }.flow.map {
             it.map {

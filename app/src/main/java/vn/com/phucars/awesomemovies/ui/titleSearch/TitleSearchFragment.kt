@@ -1,5 +1,7 @@
 package vn.com.phucars.awesomemovies.ui.titleSearch
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -98,6 +100,14 @@ class TitleSearchFragment : BaseFragment<FragmentTitleSearchBinding>() {
     }
 
     override fun setViewListener() {
+        binding.btnSortYearDecr.setOnClickListener {
+            viewModel.sortYearDecr()
+        }
+
+        binding.btnSortYearIncr.setOnClickListener {
+            viewModel.sortYearIncr()
+        }
+
         binding.edtSearchTitle.setOnEditorActionListener(object : OnEditorActionListener {
             override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -106,6 +116,19 @@ class TitleSearchFragment : BaseFragment<FragmentTitleSearchBinding>() {
                 }
                 return false
             }
+        })
+
+        binding.edtSearchTitle.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            }
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                viewModel.searchForTitle(binding.edtSearchTitle.text.toString())
+            }
+
+            override fun afterTextChanged(p0: Editable?) {
+            }
+
         })
 
         viewLifecycleOwner.lifecycleScope.launch {

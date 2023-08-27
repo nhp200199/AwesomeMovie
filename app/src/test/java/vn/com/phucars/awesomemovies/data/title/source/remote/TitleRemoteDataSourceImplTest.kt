@@ -35,7 +35,7 @@ class TitleRemoteDataSourceImplTest {
         SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         coVerify() {
-            titleService.searchForTitle(capture(slot), pageToLoad)
+            titleService.searchForTitle(capture(slot), pageToLoad, emptyMap())
         }
         assertThat(slot.captured, `is`(TitleDataTest.TITLE_SEARCH_STRING))
     }
@@ -47,6 +47,43 @@ class TitleRemoteDataSourceImplTest {
         val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForTitle, `is`(instanceOf(ResultData.Success::class.java)))
+    }
+
+    @Test
+    fun searchForTitle_success_sortYearIncrease_successValueReturned() = runTest {
+        successWithYearSortedIncr()
+
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING
+            , sortOptions = mapOf(
+                SORT to SORT_YEAR_INCR
+            )
+        )
+
+        assertThat(searchForTitle, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat((searchForTitle as ResultData.Success).data.results, `is`(
+            listOf(
+                TitleDataTest.TITLE_100_YEARS_DATA,
+                TitleDataTest.TITLE_CUONG_DATA,
+            )
+        ))
+    }
+
+    @Test
+    fun searchForTitle_success_sortYearDecrease_successValueReturned() = runTest {
+        successWithYearSortedDecr()
+
+        val searchForTitle = SUT.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING,
+            sortOptions = mapOf(
+                SORT to SORT_YEAR_DECR
+            ))
+
+        assertThat(searchForTitle, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat((searchForTitle as ResultData.Success).data.results, `is`(
+            listOf(
+                TitleDataTest.TITLE_CUONG_DATA,
+                TitleDataTest.TITLE_100_YEARS_DATA,
+            )
+        ))
     }
 
     @Test
@@ -78,7 +115,11 @@ class TitleRemoteDataSourceImplTest {
 
     private fun success() {
         coEvery {
-            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING, pageToLoad)
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                emptyMap()
+            )
         }.returns(
             NetworkResponse.Success(
                 BaseNetworkPagingData(
@@ -90,9 +131,55 @@ class TitleRemoteDataSourceImplTest {
         )
     }
 
+    private fun successWithYearSortedIncr() {
+        coEvery {
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                mapOf(
+                    SORT to SORT_YEAR_INCR
+                )
+            )
+        }.returns(
+            NetworkResponse.Success(
+                BaseNetworkPagingData(
+                    listOf(
+                        TitleDataTest.TITLE_100_YEARS_DATA,
+                        TitleDataTest.TITLE_CUONG_DATA
+                    ), "", ""
+                )
+            )
+        )
+    }
+
+    private fun successWithYearSortedDecr() {
+        coEvery {
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                mapOf(
+                    SORT to SORT_YEAR_DECR
+                )
+            )
+        }.returns(
+            NetworkResponse.Success(
+                BaseNetworkPagingData(
+                    listOf(
+                        TitleDataTest.TITLE_CUONG_DATA,
+                        TitleDataTest.TITLE_100_YEARS_DATA,
+                    ), "", ""
+                )
+            )
+        )
+    }
+
     private fun networkError() {
         coEvery {
-            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING, pageToLoad)
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                emptyMap()
+            )
         }.returns(
             NetworkResponse.NetworkError(IOException())
         )
@@ -100,7 +187,11 @@ class TitleRemoteDataSourceImplTest {
 
     private fun apiError() {
         coEvery {
-            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING, pageToLoad)
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                emptyMap()
+            )
         }.returns(
             NetworkResponse.ApiError()
         )
@@ -108,7 +199,11 @@ class TitleRemoteDataSourceImplTest {
 
     private fun unknownError() {
         coEvery {
-            titleService.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING, pageToLoad)
+            titleService.searchForTitle(
+                TitleDataTest.TITLE_SEARCH_STRING,
+                pageToLoad,
+                emptyMap()
+            )
         }.returns(
             NetworkResponse.UnknownError
         )

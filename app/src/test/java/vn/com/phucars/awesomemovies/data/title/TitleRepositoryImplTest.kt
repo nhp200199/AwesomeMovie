@@ -19,6 +19,9 @@ import vn.com.phucars.awesomemovies.CoroutineTestRule
 import vn.com.phucars.awesomemovies.data.BaseNetworkData
 import vn.com.phucars.awesomemovies.data.BaseNetworkPagingData
 import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.title.source.remote.SORT
+import vn.com.phucars.awesomemovies.data.title.source.remote.SORT_YEAR_DECR
+import vn.com.phucars.awesomemovies.data.title.source.remote.SORT_YEAR_INCR
 import vn.com.phucars.awesomemovies.data.title.source.remote.TitleRemoteDataSource
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.domain.title.TitleDomain
@@ -88,6 +91,44 @@ class TitleRepositoryImplTest {
         val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING)
 
         assertThat(searchForString, `is`(instanceOf(ResultData.Success::class.java)))
+    }
+
+    @Test
+    fun searchForTitle_success_sortWithYearIncr_successValueReturned() = runTest {
+        val titleList = successSearchForTitleSortedByYearIncr()
+        titleList.forEach {
+            mapTitleRemoteDtoToDomain(it)
+        }
+
+        val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING, mapOf(
+            SORT to SORT_YEAR_INCR
+        ))
+
+        assertThat(searchForString, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat((searchForString as ResultData.Success).data, `is`(
+            listOf(TitleDomainTest.TITLE_100_YEARS_DOMAIN,
+                TitleDomainTest.TITLE_CUONG_DOMAIN)
+        ))
+    }
+
+    @Test
+    fun searchForTitle_success_sortWithYearDecr_successValueReturned() = runTest {
+        val titleList = successSearchForTitleSortedByYearDecr()
+        titleList.forEach {
+            mapTitleRemoteDtoToDomain(it)
+        }
+
+        val searchForString = SUT.searchForString(TitleDataTest.TITLE_SEARCH_STRING, mapOf(
+            "sort" to "year.decr"
+        ))
+
+        assertThat(searchForString, `is`(instanceOf(ResultData.Success::class.java)))
+        assertThat((searchForString as ResultData.Success).data, `is`(
+            listOf(
+                TitleDomainTest.TITLE_CUONG_DOMAIN,
+                TitleDomainTest.TITLE_100_YEARS_DOMAIN,
+            )
+        ))
     }
 
     @Test
@@ -213,9 +254,63 @@ class TitleRepositoryImplTest {
         )
     }
 
-    private fun mapTitleRemoteDtoToDomain() {
-        every { titleRemoteDtoToDomain.map(TitleDataTest.TITLE_100_YEARS_DATA) }
-            .returns(TitleDomainTest.TITLE_100_YEARS_DOMAIN)
+    private fun successSearchForTitleSortedByYearIncr() : List<TitleData> {
+        val titleList = listOf(TitleDataTest.TITLE_100_YEARS_DATA,
+            TitleDataTest.TITLE_CUONG_DATA,
+        )
+
+        coEvery {
+            titleRemoteDataSource.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING,
+                sortOptions = mapOf(
+                    SORT to SORT_YEAR_INCR
+                )
+            )
+        }.returns(
+            ResultData.Success(
+                BaseNetworkPagingData(
+                    titleList,
+                    "",
+                    ""
+                )
+            )
+        )
+        return titleList
+    }
+
+    private fun successSearchForTitleSortedByYearDecr() : List<TitleData> {
+        val titleList = listOf(
+            TitleDataTest.TITLE_CUONG_DATA,
+            TitleDataTest.TITLE_100_YEARS_DATA,
+        )
+
+        coEvery {
+            titleRemoteDataSource.searchForTitle(TitleDataTest.TITLE_SEARCH_STRING,
+                sortOptions = mapOf(
+                    SORT to SORT_YEAR_DECR
+                )
+            )
+        }.returns(
+            ResultData.Success(
+                BaseNetworkPagingData(
+                    titleList,
+                    "",
+                    ""
+                )
+            )
+        )
+        return titleList
+    }
+
+    private fun mapTitleRemoteDtoToDomain(titleData: TitleData = TitleDataTest.TITLE_100_YEARS_DATA) {
+        every { titleRemoteDtoToDomain.map(titleData) }
+            .answers {
+                val a = firstArg() as TitleData
+                when(a.id) {
+                    TitleDataTest.TITLE_100_YEARS_ID -> TitleDomainTest.TITLE_100_YEARS_DOMAIN
+                    TitleDataTest.TITLE_CUONG_ID -> TitleDomainTest.TITLE_CUONG_DOMAIN
+                    else -> throw Exception("Cannot find title ID")
+                }
+            }
     }
 
     private fun mapTitleWithNullRatingRemoteDtoToDomain() {

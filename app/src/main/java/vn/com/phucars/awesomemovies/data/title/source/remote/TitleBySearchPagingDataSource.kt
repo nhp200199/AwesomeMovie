@@ -7,12 +7,13 @@ import vn.com.phucars.awesomemovies.data.title.TitleData
 
 class TitleBySearchPagingDataSource(
     private val titleRemoteDataSource: TitleRemoteDataSource,
-    private val searchString: String
+    private val searchString: String,
+    private val sortOptions: Map<String, String?> = emptyMap()
 ) : BaseRemotePagingDataSource<TitleData>() {
 
     override suspend fun requestData(page: Int): ResultData<List<TitleData>> {
         return withContext(Dispatchers.IO) {
-            val titlesByGenre = titleRemoteDataSource.searchForTitle(searchString, page = page)
+            val titlesByGenre = titleRemoteDataSource.searchForTitle(searchString, page = page, sortOptions = sortOptions)
             when (titlesByGenre) {
                 is ResultData.Error -> return@withContext ResultData.Error(titlesByGenre.exception)
                 is ResultData.Success -> return@withContext ResultData.Success(titlesByGenre.data.results)
