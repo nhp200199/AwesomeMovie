@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,11 +64,12 @@ class TitlePageItemFragment : BaseFragment<FragmentTitlePageItemBinding>() {
             }
 
         }) { item ->
-            requireActivity().supportFragmentManager.commit {
-                replace(R.id.main_container, TitleDetailFragment.newInstance(item.id, item.titleText))
-                setReorderingAllowed(true)
-                addToBackStack(null)
-            }
+            val navController = findNavController()
+            val bundle = bundleOf(
+                TitleDetailFragment.ARG_TITLE_ID to item.id,
+                TitleDetailFragment.ARG_TITLE_NAME to item.titleText
+            )
+            navController.navigate(R.id.action_titleHomeFragment_to_titleDetailFragment, bundle)
         }
         binding.rcvTitles.adapter = titleAdapter
             .withLoadStateFooter(TitleLoadStateAdapter() {

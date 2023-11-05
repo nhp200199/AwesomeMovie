@@ -22,14 +22,4 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun setViewListener() {}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                add(R.id.main_container, TitleHomeFragment())
-                setReorderingAllowed(true)
-            }
-        }
-    }
 }

@@ -173,8 +173,8 @@ class TitleDetailFragment : BaseFragment<FragmentTitleDetailBinding>() {
     }
 
     companion object {
-        private const val ARG_TITLE_NAME = "TitleDetailFragment.TitleName"
-        private const val ARG_TITLE_ID = "TitleDetailFragment.TitleId"
+        const val ARG_TITLE_NAME = "TitleDetailFragment.TitleName"
+        const val ARG_TITLE_ID = "TitleDetailFragment.TitleId"
 
         @JvmStatic
         fun newInstance(titleId: String, titleName: String) =
