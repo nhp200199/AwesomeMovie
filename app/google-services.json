@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1070043693296",
+    "project_id": "awesome-movies-4502a",
+    "storage_bucket": "awesome-movies-4502a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1070043693296:android:ec2f04d9bcee8f58810235",
+        "android_client_info": {
+          "package_name": "vn.com.phucars.awesomemovies"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC1HWewsPsVXdxsvd81hVLhHDluHKCJI5E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
