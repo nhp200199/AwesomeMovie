@@ -7,18 +7,15 @@ import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.common.exception.AuthEmailMalformedException
-import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidUserEmailException
-import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidUserPasswordException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidEmailException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidPasswordException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthUserCollisionException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthWeakPasswordException
 import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
 import vn.com.phucars.awesomemovies.mapper.Mapper
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 class AuthDataSourceImpl(
@@ -67,10 +64,10 @@ class AuthDataSourceImpl(
                         } else {
                             val exception: Exception = when(task.exception) {
                                 is FirebaseAuthInvalidUserException -> {
-                                    AuthInvalidUserEmailException()
+                                    AuthInvalidEmailException()
                                 }
                                 is FirebaseAuthInvalidCredentialsException -> {
-                                    AuthInvalidUserPasswordException()
+                                    AuthInvalidPasswordException()
                                 }
                                 else -> {
                                     UnknownException()

@@ -6,4 +6,8 @@ class AuthRepositoryImpl(private val authDataSource: AuthDataSource) : AuthRepos
     override suspend fun register(email: String, password: String): ResultData<AuthUser> {
         return authDataSource.register(email, password)
     }
+
+    override suspend fun login(email: String, password: String): ResultData<AuthUser> {
+        return authDataSource.login(email, password)
+    }
 }
