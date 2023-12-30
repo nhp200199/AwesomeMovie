@@ -6,7 +6,9 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
+import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_ANOTHER_CORRECT_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_INCORRECT_EMAIL
@@ -145,6 +147,25 @@ class RegisterViewModelTest {
             SUT.setPasswordInput(REGISTER_CORRECT_PASSWORD)
             awaitItem()
             SUT.setRepeatPasswordInput("Ph")
+
+            assertThat(awaitItem(), `is`(RegisterFormUIState(false, emptyList(),
+                emptyList(),
+                listOf(AuthorizationUIError.UNMATCHED_REPEAT_PASSWORD)
+            )))
+        }
+    }
+
+    @Test
+    @Ignore("Ignore for now. Come later when doing circular observable")
+    fun formStateFlow_repeatPasswordCorrect_passwordChanged_unMatchedPasswordError() = runTest {
+        SUT.formValidationStateFlow.test {
+            awaitItem()
+            SUT.setPasswordInput(REGISTER_CORRECT_PASSWORD)
+            awaitItem()
+            SUT.setRepeatPasswordInput(REGISTER_CORRECT_PASSWORD)
+            awaitItem()
+
+            SUT.setPasswordInput(REGISTER_ANOTHER_CORRECT_PASSWORD)
 
             assertThat(awaitItem(), `is`(RegisterFormUIState(false, emptyList(),
                 emptyList(),
