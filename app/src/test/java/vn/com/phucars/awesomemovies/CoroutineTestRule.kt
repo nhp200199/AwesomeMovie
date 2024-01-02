@@ -9,7 +9,7 @@ import org.junit.runner.Description
 import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CoroutineTestRule(val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(
+class CoroutineTestRule(private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher(
     TestCoroutineScheduler()
 )): TestWatcher() {
 

@@ -15,16 +15,18 @@ import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidPasswordExc
 import vn.com.phucars.awesomemovies.data.common.exception.AuthUserCollisionException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthWeakPasswordException
 import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
+import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.mapper.Mapper
+import javax.inject.Inject
 import kotlin.coroutines.suspendCoroutine
 
-class AuthDataSourceImpl(
+class AuthDataSourceImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val userMapper: Mapper<FirebaseUser, AuthUser>,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcherProvider: DispatcherProvider
 ) : AuthDataSource {
     override suspend fun register(email: String, password: String): ResultData<AuthUser> {
-        return withContext(dispatcher) {
+        return withContext(dispatcherProvider.io()) {
             suspendCoroutine<ResultData<AuthUser>> { cont ->
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener() { task ->
@@ -54,7 +56,7 @@ class AuthDataSourceImpl(
     }
 
     override suspend fun login(email: String, password: String): ResultData<AuthUser> {
-        return withContext(dispatcher) {
+        return withContext(dispatcherProvider.io()) {
             suspendCoroutine<ResultData<AuthUser>> { cont ->
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener() { task ->
@@ -81,7 +83,7 @@ class AuthDataSourceImpl(
     }
 
     override suspend fun logout() {
-        withContext(dispatcher) {
+        withContext(dispatcherProvider.io()) {
             firebaseAuth.signOut()
         }
     }

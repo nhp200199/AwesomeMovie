@@ -4,15 +4,19 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.databinding.FragmentLoginBinding
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 
+@AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     private val viewModel: LoginViewModel by viewModels()
 
@@ -28,6 +32,25 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     }
 
     override fun setupView() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.loginStateFlow.collect {
+                    when(it) {
+                        is ResultViewState.Loading -> {
+                            Toast.makeText(requireContext(), "loading", Toast.LENGTH_SHORT).show()
+                        }
+                        is ResultViewState.Success -> {
+                            Toast.makeText(requireContext(), "Success", Toast.LENGTH_SHORT).show()
+                        }
+                        is ResultViewState.Error -> {
+                            Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.formValidationStateFlow.collectLatest {
@@ -55,6 +78,10 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
     }
 
     override fun setViewListener() {
+        binding.btnLogin.setOnClickListener {
+            viewModel.login(binding.edtEmail.text.toString(), binding.edtPassword.text.toString())
+        }
+
         binding.edtEmail.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }

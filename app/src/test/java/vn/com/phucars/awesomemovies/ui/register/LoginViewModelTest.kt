@@ -1,24 +1,58 @@
 package vn.com.phucars.awesomemovies.ui.register
 
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.instanceOf
+import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
-import org.junit.Assert.*
+import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import vn.com.phucars.awesomemovies.CoroutineTestRule
+import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.authentication.AuthUser
+import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidEmailException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidPasswordException
+import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
+import vn.com.phucars.awesomemovies.domain.authentication.LoginUserUseCase
+import vn.com.phucars.awesomemovies.testdata.AuthDataTest
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_INCORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_SHORT_PASSWORD
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule(StandardTestDispatcher(
+        TestCoroutineScheduler()
+    ))
     private lateinit var SUT: LoginViewModel
+    private lateinit var loginUserUseCase: LoginUserUseCase
 
     @Before
     fun setup() {
-        SUT = LoginViewModel()
+        loginUserUseCase = mockk<LoginUserUseCase>()
+        SUT = LoginViewModel(loginUserUseCase, coroutineTestRule.testDispatcherProvider)
+        success()
+    }
+
+    private fun success() {
+        coEvery {
+            loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+        }.returns(
+            ResultData.Success(AuthUser())
+        )
     }
 
     @Test
@@ -29,9 +63,9 @@ class LoginViewModelTest {
             SUT.setEmailInput(REGISTER_CORRECT_EMAIL)
             SUT.setEmailInput("")
             awaitItem()
-            MatcherAssert.assertThat(
+            assertThat(
                 awaitItem(),
-                CoreMatchers.`is`(
+                `is`(
                     LoginFormUIState(
                         false, listOf(AuthorizationUIError.INVALID_EMAIL_FORMAT),
                         emptyList()
@@ -47,9 +81,9 @@ class LoginViewModelTest {
             awaitItem()
 
             SUT.setEmailInput(REGISTER_INCORRECT_EMAIL)
-            MatcherAssert.assertThat(
+            assertThat(
                 awaitItem(),
-                CoreMatchers.`is`(
+                `is`(
                     LoginFormUIState(
                         false,
                         listOf(AuthorizationUIError.INVALID_EMAIL_FORMAT),
@@ -66,9 +100,9 @@ class LoginViewModelTest {
             awaitItem()
             SUT.setEmailInput(REGISTER_CORRECT_EMAIL)
 
-            MatcherAssert.assertThat(
+            assertThat(
                 awaitItem(),
-                CoreMatchers.`is`(LoginFormUIState(false, emptyList(), emptyList()))
+                `is`(LoginFormUIState(false, emptyList(), emptyList()))
             )
         }
     }
@@ -79,8 +113,8 @@ class LoginViewModelTest {
             awaitItem()
             SUT.setPasswordInput(REGISTER_SHORT_PASSWORD)
 
-            MatcherAssert.assertThat(
-                awaitItem(), CoreMatchers.`is`(
+            assertThat(
+                awaitItem(), `is`(
                     LoginFormUIState(
                         false, emptyList(),
                         listOf(
@@ -90,5 +124,109 @@ class LoginViewModelTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun login_correctEmailAndPassword() = runTest {
+        val email = slot<String>()
+        val password = slot<String>()
+
+        SUT.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+           loginUserUseCase(capture(email), capture(password))
+        }
+
+        assertThat(email.captured, `is`(AuthDataTest.EMAIL))
+        assertThat(password.captured, `is`(AuthDataTest.PASSWORD))
+    }
+
+    @Test
+    fun login_success_successReturned() = runTest {
+        SUT.loginStateFlow.test {
+            awaitItem()
+            SUT.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+
+            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Loading::class.java)))
+            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Success::class.java)))
+        }
+    }
+
+
+    @Test
+    fun login_emailNotRegisteredError_invalidEmailReturned() = runTest {
+        invalidEmail()
+
+        SUT.loginStateFlow.test {
+            awaitItem()
+            SUT.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val loginResultState = awaitItem()
+
+            assertThat(
+                loginResultState,
+                `is`(instanceOf(ResultViewState.Error::class.java))
+            )
+            assertThat(
+                (loginResultState as ResultViewState.Error).exception,
+                `is`(instanceOf(AuthInvalidEmailException::class.java))
+            )
+        }
+    }
+
+    private fun invalidEmail() {
+        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
+            .returns(ResultData.Error(AuthInvalidEmailException()))
+    }
+
+    @Test
+    fun login_invalidPasswordError_invalidPasswordReturned() = runTest {
+        invalidPassword()
+
+        SUT.loginStateFlow.test {
+            awaitItem()
+            SUT.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(
+                result,
+                `is`(instanceOf(ResultViewState.Error::class.java))
+            )
+            assertThat(
+                (result as ResultViewState.Error).exception,
+                `is`(instanceOf(AuthInvalidPasswordException::class.java))
+            )
+        }
+    }
+
+    private fun invalidPassword() {
+        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
+            .returns(ResultData.Error(AuthInvalidPasswordException()))
+    }
+
+    @Test
+    fun login_generalError_generalErrorReturned() = runTest {
+        generalErrorWhenLogin()
+
+        SUT.loginStateFlow.test {
+            awaitItem()
+            SUT.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(
+                result,
+                `is`(instanceOf(ResultViewState.Error::class.java))
+            )
+        }
+    }
+
+    private fun generalErrorWhenLogin() {
+        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
+            .returns(ResultData.Error(UnknownException()))
     }
 }

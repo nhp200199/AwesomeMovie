@@ -1,5 +1,6 @@
 package vn.com.phucars.awesomemovies.di.app
 
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +27,8 @@ object AppModule {
     @Provides
     @Singleton
     fun titleService(retrofit: Retrofit): TitleService = retrofit.create(TitleService::class.java)
+
+    @Provides
+    @Singleton
+    fun firebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 }
