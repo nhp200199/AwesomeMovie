@@ -1,13 +1,31 @@
 package vn.com.phucars.awesomemovies.ui.register
 
 import app.cash.turbine.test
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
+import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers
+import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Before
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.Test
+import vn.com.phucars.awesomemovies.CoroutineTestRule
+import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.authentication.AuthUser
+import vn.com.phucars.awesomemovies.data.common.exception.AuthEmailMalformedException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthUserCollisionException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthWeakPasswordException
+import vn.com.phucars.awesomemovies.domain.authentication.RegisterUseCase
+import vn.com.phucars.awesomemovies.testdata.AuthDataTest
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_ANOTHER_CORRECT_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_PASSWORD
@@ -16,15 +34,120 @@ import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_NO_NUMBER_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_NO_UPPERCASE_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_SHORT_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_WHITE_SPACE_PASSWORD
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RegisterViewModelTest {
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule(
+        StandardTestDispatcher(
+            TestCoroutineScheduler()
+        )
+    )
     private lateinit var SUT: RegisterViewModel
+    private lateinit var registerUseCase: RegisterUseCase
 
     @Before
     fun setup() {
-        SUT = RegisterViewModel()
+        registerUseCase = mockk<RegisterUseCase>()
+        SUT = RegisterViewModel(coroutineTestRule.testDispatcherProvider, registerUseCase)
+        success()
     }
+
+    private fun success() {
+        coEvery {
+            registerUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+        }.returns(ResultData.Success(AuthUser()))
+    }
+
+    @Test
+    fun register_correctEmailAndPassword() = runTest {
+        val email = slot<String>()
+        val password = slot<String>()
+
+        SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+        advanceUntilIdle()
+
+        coVerify(exactly = 1) {
+            registerUseCase(capture(email), capture(password))
+        }
+
+        assertThat(AuthDataTest.EMAIL, `is`(AuthDataTest.EMAIL))
+        assertThat(AuthDataTest.PASSWORD, `is`(AuthDataTest.PASSWORD))
+    }
+
+    @Test
+    fun register_success_loadingReturned() = runTest {
+        SUT.registerStateFlow.test {
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Loading::class.java)))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun register_success_successReturned() = runTest {
+        SUT.registerStateFlow.test {
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+            awaitItem()
+
+            assertThat(awaitItem(), `is`(instanceOf(ResultViewState.Success::class.java)))
+        }
+    }
+
+//    @Test
+//    fun register_weakPassword_weakPasswordErrorReturned() = runTest {
+//        weakPassword()
+//
+//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+//
+//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
+//        assertThat((result as ResultData.Error).exception, `is`(
+//            CoreMatchers.instanceOf(
+//                AuthWeakPasswordException::class.java
+//            )
+//        ))
+//    }
+//
+//    @Test
+//    fun register_malformedEmail_malformedEmailErrorReturned() = runTest {
+//        malformedEmail()
+//
+//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+//
+//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
+//        assertThat((result as ResultData.Error).exception, `is`(
+//            CoreMatchers.instanceOf(
+//                AuthEmailMalformedException::class.java
+//            )
+//        ))
+//    }
+//
+//    @Test
+//    fun register_collisionUser_collisionUserErrorReturned() = runTest {
+//        collisionUser()
+//
+//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+//
+//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
+//        assertThat((result as ResultData.Error).exception, `is`(
+//            CoreMatchers.instanceOf(
+//                AuthUserCollisionException::class.java
+//            )
+//        ))
+//    }
+//
+//    @Test
+//    fun register_generalError_failureReturned() = runTest {
+//        generalError()
+//
+//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+//
+//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
+//    }
 
     @Test
     fun formStateFlow_emailFieldIsClear_incorrectEmailFormatErrorsReturned() = runTest {

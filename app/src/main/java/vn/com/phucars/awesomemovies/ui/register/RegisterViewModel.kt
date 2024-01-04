@@ -1,19 +1,41 @@
 package vn.com.phucars.awesomemovies.ui.register
 
-import android.text.TextUtils
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import okhttp3.internal.toImmutableList
+import vn.com.phucars.awesomemovies.data.ResultData
+import vn.com.phucars.awesomemovies.data.authentication.AuthUser
+import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
+import vn.com.phucars.awesomemovies.domain.authentication.RegisterUseCase
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.isValidEmail
 
-class RegisterViewModel() : ViewModel() {
+class RegisterViewModel(
+    private val dispatcherProvider: DispatcherProvider,
+    private val registerUseCase: RegisterUseCase
+) : ViewModel() {
 
     private val emailInputStateFlow = MutableStateFlow<String?>(null)
     private val passwordStateFlow = MutableStateFlow<String?>(null)
     private val repeatPasswordStateFlow = MutableStateFlow<String?>(null)
+    private val _registerStateFlow = MutableStateFlow<ResultViewState<Any>>(ResultViewState.Initial)
+    val registerStateFlow = _registerStateFlow.asStateFlow()
+
+    fun register(email: String, password: String) {
+        viewModelScope.launch(dispatcherProvider.main()) {
+            _registerStateFlow.value = ResultViewState.Loading
+            val registerResult = registerUseCase(email, password)
+            when(registerResult) {
+                is ResultData.Success -> _registerStateFlow.value = ResultViewState.Success<AuthUser>(registerResult.data)
+                is ResultData.Error -> _registerStateFlow.value = ResultViewState.Error(registerResult.exception)
+            }
+        }
+    }
 
     private val emailValidStateFlow = emailInputStateFlow.map {
         val emailError = mutableListOf<AuthorizationUIError>()
