@@ -24,6 +24,7 @@ import vn.com.phucars.awesomemovies.data.authentication.AuthUser
 import vn.com.phucars.awesomemovies.data.common.exception.AuthEmailMalformedException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthUserCollisionException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthWeakPasswordException
+import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
 import vn.com.phucars.awesomemovies.domain.authentication.RegisterUseCase
 import vn.com.phucars.awesomemovies.testdata.AuthDataTest
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_ANOTHER_CORRECT_PASSWORD
@@ -35,6 +36,13 @@ import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_NO_UPPERCASE_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_SHORT_PASSWORD
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_WHITE_SPACE_PASSWORD
 import vn.com.phucars.awesomemovies.ui.ResultViewState
+
+private enum class RegistrationErrors {
+    WEAK_PASSWORD,
+    MALFORMED_EMAIL,
+    COLLISION_USER,
+    UNKNOWN
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RegisterViewModelTest {
@@ -87,6 +95,7 @@ class RegisterViewModelTest {
         }
     }
 
+
     @Test
     fun register_success_successReturned() = runTest {
         SUT.registerStateFlow.test {
@@ -98,56 +107,65 @@ class RegisterViewModelTest {
         }
     }
 
-//    @Test
-//    fun register_weakPassword_weakPasswordErrorReturned() = runTest {
-//        weakPassword()
-//
-//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
-//
-//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
-//        assertThat((result as ResultData.Error).exception, `is`(
-//            CoreMatchers.instanceOf(
-//                AuthWeakPasswordException::class.java
-//            )
-//        ))
-//    }
-//
-//    @Test
-//    fun register_malformedEmail_malformedEmailErrorReturned() = runTest {
-//        malformedEmail()
-//
-//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
-//
-//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
-//        assertThat((result as ResultData.Error).exception, `is`(
-//            CoreMatchers.instanceOf(
-//                AuthEmailMalformedException::class.java
-//            )
-//        ))
-//    }
-//
-//    @Test
-//    fun register_collisionUser_collisionUserErrorReturned() = runTest {
-//        collisionUser()
-//
-//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
-//
-//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
-//        assertThat((result as ResultData.Error).exception, `is`(
-//            CoreMatchers.instanceOf(
-//                AuthUserCollisionException::class.java
-//            )
-//        ))
-//    }
-//
-//    @Test
-//    fun register_generalError_failureReturned() = runTest {
-//        generalError()
-//
-//        val result = SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
-//
-//        assertThat(result, `is`(CoreMatchers.instanceOf(ResultData.Error::class.java)))
-//    }
+    @Test
+    fun register_weakPassword_weakPasswordErrorReturned() = runTest {
+        generateError(RegistrationErrors.WEAK_PASSWORD)
+
+        SUT.registerStateFlow.test {
+            awaitItem()
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(result, `is`(CoreMatchers.instanceOf(ResultViewState.Error::class.java)))
+            assertThat((result as ResultViewState.Error).exception, `is`(instanceOf(AuthWeakPasswordException::class.java)))
+        }
+    }
+
+    @Test
+    fun register_malformedEmail_malformedEmailErrorReturned() = runTest {
+        generateError(RegistrationErrors.MALFORMED_EMAIL)
+
+        SUT.registerStateFlow.test {
+            awaitItem()
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(result, `is`(CoreMatchers.instanceOf(ResultViewState.Error::class.java)))
+            assertThat((result as ResultViewState.Error).exception, `is`(instanceOf(AuthEmailMalformedException::class.java)))
+        }
+    }
+
+    @Test
+    fun register_collisionUser_collisionUserErrorReturned() = runTest {
+        generateError(RegistrationErrors.COLLISION_USER)
+
+        SUT.registerStateFlow.test {
+            awaitItem()
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(result, `is`(CoreMatchers.instanceOf(ResultViewState.Error::class.java)))
+            assertThat((result as ResultViewState.Error).exception, `is`(instanceOf(AuthUserCollisionException::class.java)))
+        }
+    }
+
+    @Test
+    fun register_generalError_failureReturned() = runTest {
+        generateError(RegistrationErrors.UNKNOWN)
+
+        SUT.registerStateFlow.test {
+            awaitItem()
+            SUT.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+            awaitItem()
+
+            val result = awaitItem()
+            assertThat(result, `is`(CoreMatchers.instanceOf(ResultViewState.Error::class.java)))
+            assertThat((result as ResultViewState.Error).exception, `is`(instanceOf(UnknownException::class.java)))
+        }
+    }
 
     @Test
     fun formStateFlow_emailFieldIsClear_incorrectEmailFormatErrorsReturned() = runTest {
@@ -329,5 +347,20 @@ class RegisterViewModelTest {
                 emptyList()
             )))
         }
+    }
+
+    private fun generateError(errorType: RegistrationErrors) {
+        val exception = when(errorType) {
+            RegistrationErrors.WEAK_PASSWORD -> AuthWeakPasswordException("")
+            RegistrationErrors.MALFORMED_EMAIL -> AuthEmailMalformedException("")
+            RegistrationErrors.COLLISION_USER -> AuthUserCollisionException("")
+            RegistrationErrors.UNKNOWN -> UnknownException()
+        }
+        val result =  ResultData.Error(exception)
+        coEvery {
+            registerUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+        }.returns(
+            result
+        )
     }
 }

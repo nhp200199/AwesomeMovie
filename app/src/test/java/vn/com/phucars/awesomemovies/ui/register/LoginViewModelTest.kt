@@ -21,8 +21,11 @@ import org.junit.Test
 import vn.com.phucars.awesomemovies.CoroutineTestRule
 import vn.com.phucars.awesomemovies.data.ResultData
 import vn.com.phucars.awesomemovies.data.authentication.AuthUser
+import vn.com.phucars.awesomemovies.data.common.exception.AuthEmailMalformedException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidEmailException
 import vn.com.phucars.awesomemovies.data.common.exception.AuthInvalidPasswordException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthUserCollisionException
+import vn.com.phucars.awesomemovies.data.common.exception.AuthWeakPasswordException
 import vn.com.phucars.awesomemovies.data.common.exception.UnknownException
 import vn.com.phucars.awesomemovies.domain.authentication.LoginUserUseCase
 import vn.com.phucars.awesomemovies.testdata.AuthDataTest
@@ -30,6 +33,12 @@ import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_CORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_INCORRECT_EMAIL
 import vn.com.phucars.awesomemovies.testdata.ui.REGISTER_SHORT_PASSWORD
 import vn.com.phucars.awesomemovies.ui.ResultViewState
+
+private enum class LoginErrors {
+    UNKNOWN,
+    INVALID_EMAIL,
+    INVALID_PASSWORD
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -157,7 +166,7 @@ class LoginViewModelTest {
 
     @Test
     fun login_emailNotRegisteredError_invalidEmailReturned() = runTest {
-        invalidEmail()
+        generateError(LoginErrors.INVALID_EMAIL)
 
         SUT.loginStateFlow.test {
             awaitItem()
@@ -177,14 +186,9 @@ class LoginViewModelTest {
         }
     }
 
-    private fun invalidEmail() {
-        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
-            .returns(ResultData.Error(AuthInvalidEmailException()))
-    }
-
     @Test
     fun login_invalidPasswordError_invalidPasswordReturned() = runTest {
-        invalidPassword()
+        generateError(LoginErrors.INVALID_PASSWORD)
 
         SUT.loginStateFlow.test {
             awaitItem()
@@ -203,14 +207,9 @@ class LoginViewModelTest {
         }
     }
 
-    private fun invalidPassword() {
-        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
-            .returns(ResultData.Error(AuthInvalidPasswordException()))
-    }
-
     @Test
     fun login_generalError_generalErrorReturned() = runTest {
-        generalErrorWhenLogin()
+        generateError(LoginErrors.UNKNOWN)
 
         SUT.loginStateFlow.test {
             awaitItem()
@@ -225,8 +224,17 @@ class LoginViewModelTest {
         }
     }
 
-    private fun generalErrorWhenLogin() {
-        coEvery { loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
-            .returns(ResultData.Error(UnknownException()))
+    private fun generateError(errorType: LoginErrors) {
+        val exception = when(errorType) {
+            LoginErrors.UNKNOWN -> UnknownException()
+            LoginErrors.INVALID_EMAIL -> AuthInvalidEmailException()
+            LoginErrors.INVALID_PASSWORD -> AuthInvalidPasswordException()
+        }
+        val result =  ResultData.Error(exception)
+        coEvery {
+            loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
+        }.returns(
+            result
+        )
     }
 }
