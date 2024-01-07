@@ -2,6 +2,7 @@ package vn.com.phucars.awesomemovies.ui.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -14,8 +15,10 @@ import vn.com.phucars.awesomemovies.dispatcher.DispatcherProvider
 import vn.com.phucars.awesomemovies.domain.authentication.RegisterUseCase
 import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.isValidEmail
+import javax.inject.Inject
 
-class RegisterViewModel(
+@HiltViewModel
+class RegisterViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val registerUseCase: RegisterUseCase
 ) : ViewModel() {

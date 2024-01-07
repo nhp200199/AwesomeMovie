@@ -5,15 +5,19 @@ import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import vn.com.phucars.awesomemovies.databinding.FragmentRegisterBinding
+import vn.com.phucars.awesomemovies.ui.ResultViewState
 import vn.com.phucars.awesomemovies.ui.base.BaseFragment
 
+@AndroidEntryPoint
 class RegisterFragment : BaseFragment<FragmentRegisterBinding>() {
     private val viewModel: RegisterViewModel by viewModels()
 
@@ -43,6 +47,25 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.registerStateFlow.collect {
+                    when(it) {
+                        is ResultViewState.Loading -> {
+                            Toast.makeText(requireContext(), "loading", Toast.LENGTH_SHORT).show()
+                        }
+                        is ResultViewState.Success -> {
+                            Toast.makeText(requireContext(), "Success", Toast.LENGTH_SHORT).show()
+                        }
+                        is ResultViewState.Error -> {
+                            Toast.makeText(requireContext(), "Error", Toast.LENGTH_SHORT).show()
+                        }
+                        else -> {}
+                    }
+                }
+            }
+        }
     }
 
     private fun formatErrorList(errorState: List<AuthorizationUIError>): String {
@@ -58,6 +81,10 @@ class RegisterFragment : BaseFragment<FragmentRegisterBinding>() {
     }
 
     override fun setViewListener() {
+        binding.btnRegister.setOnClickListener {
+            viewModel.register(binding.edtRegEmail.text.toString(), binding.edtRegPassword.text.toString()  )
+        }
+
         binding.edtRegEmail.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
