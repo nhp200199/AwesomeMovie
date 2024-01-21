@@ -60,7 +60,7 @@ class LoginViewModelTest {
         coEvery {
             loginUserUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
         }.returns(
-            ResultData.Success(AuthUser())
+            ResultData.Success("123")
         )
     }
 

@@ -146,10 +146,10 @@ class AuthRepositoryImplTest {
 
     private fun success() {
         coEvery { authDataSource.register(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
-            .returns(ResultData.Success(AuthUser()))
+            .returns(ResultData.Success("123"))
 
         coEvery { authDataSource.login(AuthDataTest.EMAIL, AuthDataTest.PASSWORD) }
-            .returns(ResultData.Success(AuthUser()))
+            .returns(ResultData.Success("123"))
     }
 
     private fun generalError() {

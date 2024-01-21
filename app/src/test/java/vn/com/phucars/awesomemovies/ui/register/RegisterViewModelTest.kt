@@ -65,7 +65,7 @@ class RegisterViewModelTest {
     private fun success() {
         coEvery {
             registerUseCase(AuthDataTest.EMAIL, AuthDataTest.PASSWORD)
-        }.returns(ResultData.Success(AuthUser()))
+        }.returns(ResultData.Success("123"))
     }
 
     @Test

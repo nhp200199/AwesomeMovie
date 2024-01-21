@@ -22,12 +22,12 @@ import kotlin.coroutines.suspendCoroutine
 
 class AuthDataSourceImpl @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
-    private val userMapper: Mapper<FirebaseUser, AuthUser>,
+    private val userMapper: Mapper<FirebaseUser, String>,
     private val dispatcherProvider: DispatcherProvider
 ) : AuthDataSource {
-    override suspend fun register(email: String, password: String): ResultData<AuthUser> {
+    override suspend fun register(email: String, password: String): ResultData<String> {
         return withContext(dispatcherProvider.io()) {
-            suspendCoroutine<ResultData<AuthUser>> { cont ->
+            suspendCoroutine<ResultData<String>> { cont ->
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener() { task ->
                         if (task.isSuccessful) {
@@ -54,9 +54,9 @@ class AuthDataSourceImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(email: String, password: String): ResultData<AuthUser> {
+    override suspend fun login(email: String, password: String): ResultData<String> {
         return withContext(dispatcherProvider.io()) {
-            suspendCoroutine<ResultData<AuthUser>> { cont ->
+            suspendCoroutine<ResultData<String>> { cont ->
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener() { task ->
                         if (task.isSuccessful) {

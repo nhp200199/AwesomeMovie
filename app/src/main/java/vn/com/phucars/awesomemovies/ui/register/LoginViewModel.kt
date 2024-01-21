@@ -33,7 +33,7 @@ class LoginViewModel @Inject constructor(
             _loginStateFlow.value = ResultViewState.Loading
             val loginResult = loginUserUseCase(email, password)
             when(loginResult) {
-                is ResultData.Success -> _loginStateFlow.value = ResultViewState.Success<AuthUser>(loginResult.data)
+                is ResultData.Success -> _loginStateFlow.value = ResultViewState.Success<String>(loginResult.data)
                 is ResultData.Error -> _loginStateFlow.value = ResultViewState.Error(loginResult.exception)
             }
         }

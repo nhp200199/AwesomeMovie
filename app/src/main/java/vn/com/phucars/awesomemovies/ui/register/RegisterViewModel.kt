@@ -34,7 +34,7 @@ class RegisterViewModel @Inject constructor(
             _registerStateFlow.value = ResultViewState.Loading
             val registerResult = registerUseCase(email, password)
             when(registerResult) {
-                is ResultData.Success -> _registerStateFlow.value = ResultViewState.Success<AuthUser>(registerResult.data)
+                is ResultData.Success -> _registerStateFlow.value = ResultViewState.Success<String>(registerResult.data)
                 is ResultData.Error -> _registerStateFlow.value = ResultViewState.Error(registerResult.exception)
             }
         }

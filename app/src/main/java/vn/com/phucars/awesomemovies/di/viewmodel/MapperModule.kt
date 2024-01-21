@@ -24,5 +24,5 @@ object MapperModule {
     fun newTitleWithRatingRemoteDtoToDomain(): Mapper<DetailTitleRemoteData, TitleWithRatingDomain> = NewTitleWithRatingRemoteDtoToDomain()
 
     @Provides
-    fun firebaseAuthUserToDomain(): Mapper<FirebaseUser, AuthUser> = AuthUserMapper()
+    fun firebaseAuthUserToDomain(): Mapper<FirebaseUser, String> = AuthUserMapper()
 }
