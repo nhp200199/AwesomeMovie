@@ -1,6 +1,8 @@
 package vn.com.phucars.awesomemovies.di.app
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,4 +33,8 @@ object AppModule {
     @Provides
     @Singleton
     fun firebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun firebaseDatabase(): DatabaseReference = FirebaseDatabase.getInstance("https://awesome-movies-4502a-default-rtdb.asia-southeast1.firebasedatabase.app/").reference
 }

@@ -26,7 +26,7 @@ class RegisterViewModel @Inject constructor(
     private val emailInputStateFlow = MutableStateFlow<String?>(null)
     private val passwordStateFlow = MutableStateFlow<String?>(null)
     private val repeatPasswordStateFlow = MutableStateFlow<String?>(null)
-    private val _registerStateFlow = MutableStateFlow<ResultViewState<Any>>(ResultViewState.Initial)
+    private val _registerStateFlow = MutableStateFlow<ResultViewState<*>>(ResultViewState.Initial)
     val registerStateFlow = _registerStateFlow.asStateFlow()
 
     fun register(email: String, password: String) {
@@ -34,7 +34,7 @@ class RegisterViewModel @Inject constructor(
             _registerStateFlow.value = ResultViewState.Loading
             val registerResult = registerUseCase(email, password)
             when(registerResult) {
-                is ResultData.Success -> _registerStateFlow.value = ResultViewState.Success<String>(registerResult.data)
+                is ResultData.Success -> _registerStateFlow.value = ResultViewState.Success(registerResult.data)
                 is ResultData.Error -> _registerStateFlow.value = ResultViewState.Error(registerResult.exception)
             }
         }

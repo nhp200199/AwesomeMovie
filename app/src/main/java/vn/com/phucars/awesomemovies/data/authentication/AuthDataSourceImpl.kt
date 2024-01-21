@@ -38,10 +38,10 @@ class AuthDataSourceImpl @Inject constructor(
                                     AuthWeakPasswordException((task.exception as FirebaseAuthWeakPasswordException).localizedMessage!!)
                                 }
                                 is FirebaseAuthInvalidCredentialsException -> {
-                                    AuthEmailMalformedException((task.exception as AuthEmailMalformedException).localizedMessage!!)
+                                    AuthEmailMalformedException((task.exception as FirebaseAuthInvalidCredentialsException).localizedMessage!!)
                                 }
                                 is FirebaseAuthUserCollisionException -> {
-                                    AuthUserCollisionException((task.exception as AuthUserCollisionException).localizedMessage!!)
+                                    AuthUserCollisionException((task.exception as FirebaseAuthUserCollisionException).localizedMessage!!)
                                 }
                                 else -> {
                                     UnknownException()
