@@ -31,7 +31,6 @@ class AuthDataSourceImpl @Inject constructor(
                 firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener() { task ->
                         if (task.isSuccessful) {
-                            firebaseAuth.currentUser
                             cont.resumeWith(Result.success(ResultData.Success(userMapper.map(firebaseAuth.currentUser!!))))
                         } else {
                             val exception: Exception = when(task.exception) {
