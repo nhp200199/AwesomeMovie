@@ -2,6 +2,7 @@ package vn.com.phucars.awesomemovies.ui.register
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -60,6 +61,14 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>() {
 
                     binding.tilEmail.error = emailErrorsDescription
                     binding.tilPassword.error = passwordErrorsDescription
+                }
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle((Lifecycle.State.STARTED)) {
+                viewModel.userDataFlow.collectLatest {
+                    Toast.makeText(requireContext(), "User data = $it", Toast.LENGTH_SHORT).show()
                 }
             }
         }

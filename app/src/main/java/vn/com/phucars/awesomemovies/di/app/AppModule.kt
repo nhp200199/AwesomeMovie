@@ -1,5 +1,8 @@
 package vn.com.phucars.awesomemovies.di.app
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -33,6 +36,10 @@ object AppModule {
     @Provides
     @Singleton
     fun firebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
+
+    @Provides
+    @Singleton
+    fun sharedPref(app: Application): SharedPreferences = app.getSharedPreferences("MOVIE_APP", Context.MODE_PRIVATE)
 
     @Provides
     @Singleton
